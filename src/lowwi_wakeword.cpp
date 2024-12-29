@@ -54,7 +54,6 @@ namespace CLFML::LOWWI
                     {
                         // Trigger level reached
                         {
-                            std::cout <<"Det!\n";
                             res = 1;
                         }
                         activation = -20;

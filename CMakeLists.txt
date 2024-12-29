@@ -65,8 +65,8 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
 if(CLFML_LOWWI_BUILD_EXAMPLE_PROJECTS)
     find_package(SDL2 REQUIRED)
-    set(LOWWI_EXAMPLE_FRAGMENTS_PATH ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo/example_fragments)
-    add_executable(LOWWI_demo ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo/demo.cpp)
+    set(LOWWI_EXAMPLE_FRAGMENTS_PATH ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_fragment/example_fragments)
+    add_executable(LOWWI_demo ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_fragment/demo.cpp)
     add_executable(LOWWI_demo_mic ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_mic/demo_mic.cpp
                                   ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_mic/audio_async/audio_async.cpp)
     target_compile_definitions(LOWWI_demo PUBLIC -DCLFML_LOWWI_EXAMPLE_FRAGMENTS="${LOWWI_EXAMPLE_FRAGMENTS_PATH}")

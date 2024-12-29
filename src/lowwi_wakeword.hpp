@@ -26,7 +26,6 @@ namespace CLFML::LOWWI
         std::array<const char *, 1> _output_names{"39"};
         std::vector<Ort::Value> _input_tensors;
         std::vector<Ort::Value> _output_tensors;
-
         std::vector<float> _samples_to_process;
         Ort::AllocatorWithDefaultOptions _allocator;
         const std::array<int64_t, 3> _input_shape{1, (int64_t)16, 96};
