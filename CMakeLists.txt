@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1...3.14)
 
-project(LOWWI VERSION 3.11.5 LANGUAGES CXX)
+project(Lowwi VERSION 3.11.5 LANGUAGES CXX)
 
 set(MAIN_PROJECT OFF)
 
@@ -76,8 +76,8 @@ if(CLFML_LOWWI_BUILD_EXAMPLE_PROJECTS)
     add_executable(LOWWI_demo_mic ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_mic/demo_mic.cpp
                                   ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_mic/audio_async/audio_async.cpp)
     target_compile_definitions(LOWWI_demo PUBLIC -DCLFML_LOWWI_EXAMPLE_FRAGMENTS="${LOWWI_EXAMPLE_FRAGMENTS_PATH}")
-    target_link_libraries(LOWWI_demo PRIVATE LOWWI)
+    target_link_libraries(LOWWI_demo PRIVATE Lowwi)
     target_include_directories(LOWWI_demo_mic PRIVATE ${SDL2_INCLUDE_DIRS} ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_mic/audio_async)
-    target_link_libraries(LOWWI_demo_mic PUBLIC LOWWI ${SDL2_LIBRARIES})
+    target_link_libraries(LOWWI_demo_mic PUBLIC Lowwi ${SDL2_LIBRARIES})
 endif()
 
