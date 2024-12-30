@@ -1,4 +1,4 @@
-# Lowwi - Lightweigth openwakeword implementation written in C++.
+# Lowwi - Lightweight openwakeword implementation written in C++.
  Wakeword detector based on OpenWakeWord-cpp but faster, cleaner and more lightweight.
 
 - Plain C/C++ implementation with minimal dependencies (ONNXRuntime)
