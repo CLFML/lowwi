@@ -47,8 +47,11 @@ namespace CLFML::LOWWI
         _wakewords.push_back(std::move(wakeword));
     }
     
-    void Lowwi::remove_wakeword(const char *model_path)
+    void Lowwi::remove_wakeword(std::filesystem::path model_path)
     {
+        _wakewords.erase(std::remove_if(_wakewords.begin(), _wakewords.end(), [model_path](const wakeword_t &ww) {
+            return ww.properties.model_path == model_path;
+        }), _wakewords.end());
     }
     
     void Lowwi::run(const std::vector<float> &audio_samples)

@@ -64,7 +64,7 @@ namespace CLFML::LOWWI
          * @brief Remove wakeword from detection runtime
          * @param model_path Model path of the to be removed wakeword
          */
-        void remove_wakeword(const char* model_path);
+        void remove_wakeword(std::filesystem::path model_path);
 
         /**
          * @brief Runs wakeword detection runtime on audio samples

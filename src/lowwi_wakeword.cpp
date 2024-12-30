@@ -144,6 +144,7 @@ namespace CLFML::LOWWI
 
     WakeWord::~WakeWord()
     {
+        _session.release();
     }
 
 }
