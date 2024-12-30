@@ -31,8 +31,8 @@ namespace CLFML::LOWWI
         _env.DisableTelemetryEvents();
         _session_opt.SetIntraOpNumThreads(1);
         _session_opt.SetInterOpNumThreads(1);
-        _mel = std::make_unique<Melspectrogram>(std::ref(_env), std::ref(_session_opt));
-        _emb = std::make_unique<Embedding>(std::ref(_env), std::ref(_session_opt));
+        _mel = std::make_unique<Melspectrogram>(_env, _session_opt);
+        _emb = std::make_unique<Embedding>(_env, _session_opt);
     }
 
     void Lowwi::add_wakeword(const Lowwi_word_t& lowwi_word)
@@ -41,7 +41,7 @@ namespace CLFML::LOWWI
             throw std::runtime_error("[LOWI]: ERROR! No callback function defined for lowwi_word!");
         }
         wakeword_t wakeword = {
-            .ww_inst = std::make_unique<WakeWord>(std::ref(_env), std::ref(_session_opt), lowwi_word.model_path, lowwi_word.threshold, lowwi_word.min_activations, lowwi_word.refractory, lowwi_word.debug),
+            .ww_inst = std::make_unique<WakeWord>(_env, _session_opt, lowwi_word.model_path, lowwi_word.threshold, lowwi_word.min_activations, lowwi_word.refractory, lowwi_word.debug),
             .properties = lowwi_word,
         };
         _wakewords.push_back(std::move(wakeword));
@@ -66,8 +66,8 @@ namespace CLFML::LOWWI
                 ww.properties.cbfunc(cb, ww.properties.cb_arg);
             }
         }
-        _mel_samples.clear();
-        _feature_samples.clear();
+        _mel_samples.resize(0);
+        _feature_samples.resize(0);
     }
 
     Lowwi::~Lowwi()

@@ -33,10 +33,13 @@ namespace CLFML::LOWWI
     std::vector<float> &Embedding::convert(const std::vector<float> &mels_in)
     {
         /* Clear any old samples before proceeding */
-        _embedding_out.clear();
+        _embedding_out.resize(0);
+
+        /* Reserve the space for the samples */
+        _samples_to_process.reserve(mels_in.size()+_samples_to_process.size());
 
         /* Copy the melspectrogram samples to internal buffer */
-        std::copy(mels_in.begin(), mels_in.end(), std::back_inserter(_samples_to_process));
+        _samples_to_process.insert(_samples_to_process.end(), mels_in.begin(), mels_in.end());
 
         /*
          * At a 16 kHz sampling rate,

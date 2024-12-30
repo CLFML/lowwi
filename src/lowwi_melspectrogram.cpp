@@ -36,7 +36,7 @@ namespace CLFML::LOWWI
 
     std::vector<float> &Melspectrogram::convert(const std::vector<float> &audio_samples)
     {
-        _melspectrogram_out.clear();
+        _melspectrogram_out.resize(0);
 
         _samples_to_process.reserve(audio_samples.size() + _samples_to_process.size());
 
@@ -48,7 +48,7 @@ namespace CLFML::LOWWI
          * This is almost negligible.
          * But might be interesting to profile in the near future, when doing further optimizations.
          */
-        std::copy(audio_samples.begin(), audio_samples.end(), std::back_inserter(_samples_to_process));
+        _samples_to_process.insert(_samples_to_process.end(), audio_samples.begin(), audio_samples.end());
 
         size_t start_idx = 0;
 

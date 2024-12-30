@@ -26,6 +26,7 @@
 #include <cstring>
 #include <cstdint>
 #include <csignal>
+#include <thread>
 
 #define AUDIO_DEFAULT_MIC -1
 #define AUDIO_SAMPLE_RATE 16000
@@ -56,6 +57,7 @@ int main(int argc, char *argv[])
 {
     // Register signal handler
     std::signal(SIGINT, signalHandler);
+
     /* Create new audio_async recorder with 5 seconds of buffering space*/
     std::shared_ptr<audio_async> audio = std::make_shared<audio_async>(5 * 1000);
 
@@ -85,12 +87,16 @@ int main(int argc, char *argv[])
 
     while (keepRunning)
     {
-        /* Get 2-seconds of audio */
-        audio->get(2000, audio_buffer);
+        /* Get 1-second of audio */
+        audio->get(1000, audio_buffer);
         /* Run the wakeword models */
         ww_runtime.run(audio_buffer);
         /* Clear the audio buffer */
         audio_buffer.clear();
+        
+        /* Sleep for 200 milliseconds, to let CPU relax for bit */
+        /* Otherwise we will never reach our 2% CPU Utilization :) */
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 
     return 0;

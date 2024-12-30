@@ -45,6 +45,12 @@ namespace CLFML::LOWWI
         {
             return res;
         }
+        
+        /* Reserve the space for the samples */
+        _samples_to_process.reserve(features.size()+_samples_to_process.size());
+
+        /* Copy the melspectrogram samples to internal buffer */
+        _samples_to_process.insert(_samples_to_process.end(), features.begin(), features.end());
 
         /* Copy features to internal buffer for further processing */
         std::copy(features.begin(), features.end(), std::back_inserter(_samples_to_process));
