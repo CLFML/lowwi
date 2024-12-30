@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
     /* Configure the wakeword model */
     CLFML::LOWWI::Lowwi_word_t ww{
         .phrase = "Hey Mycroft",
-        .model_path = "wakeword.onnx",
+        .model_path = "models/example_wakewords/hey_mycroft.onnx",
         .cbfunc = wakeword_callback,
     };
 
