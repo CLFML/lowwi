@@ -1,11 +1,33 @@
+/*
+ *  Copyright 2024 (C) Jeroen Veen <ducroq> & Victor Hogeweij <Hoog-V>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ * This file is part of the Lowwi library
+ *
+ * Author:          Victor Hogeweij <Hoog-V>
+ *
+ */
+
 #include "lowwi.hpp"
 #include <iostream>
+#include <exception>
 
 namespace CLFML::LOWWI
 {
-    Lowwi::Lowwi(const int mic_index)
+    Lowwi::Lowwi()
     {
-        _env = Ort::Env(OrtLoggingLevel::ORT_LOGGING_LEVEL_WARNING, "test");
+        _env = Ort::Env(OrtLoggingLevel::ORT_LOGGING_LEVEL_WARNING, "LOWWI_Runtime");
         _env.DisableTelemetryEvents();
         _session_opt.SetIntraOpNumThreads(1);
         _session_opt.SetInterOpNumThreads(1);
@@ -13,37 +35,39 @@ namespace CLFML::LOWWI
         _emb = std::make_unique<Embedding>(std::ref(_env), std::ref(_session_opt));
     }
 
-    void Lowwi::add_wakeword(const Lowwi_word_t lowwi_word)
+    void Lowwi::add_wakeword(const Lowwi_word_t& lowwi_word)
     {
+        if(!lowwi_word.cbfunc) {
+            throw std::runtime_error("[LOWI]: ERROR! No callback function defined for lowwi_word!");
+        }
         wakeword_t wakeword = {
-            .ww_inst = std::make_unique<WakeWord>(std::ref(_env), std::ref(_session_opt), lowwi_word.model_path, 0.5f),
+            .ww_inst = std::make_unique<WakeWord>(std::ref(_env), std::ref(_session_opt), lowwi_word.model_path, lowwi_word.threshold, lowwi_word.min_activations, lowwi_word.refractory, lowwi_word.debug),
             .properties = lowwi_word,
         };
         _wakewords.push_back(std::move(wakeword));
     }
     
-    void Lowwi::remove_wakeword(const std::string lowi_word_phrase)
+    void Lowwi::remove_wakeword(const char *model_path)
     {
     }
     
-    void Lowwi::detect(const std::vector<float> &audio_samples)
+    void Lowwi::run(const std::vector<float> &audio_samples)
     {
         if(audio_samples.empty()) {
             return;
         }
         
-        _raw_samples = audio_samples;
-        _mel_samples = _mel->convert(std::ref(_raw_samples));
+        _mel_samples = _mel->convert(std::ref(audio_samples));
         _feature_samples = _emb->convert(std::ref(_mel_samples));
         for (auto &ww : _wakewords) {
-            if(ww.ww_inst->detect(_feature_samples)) {
-                Lowwi_cb_t cb = {.phrase = ww.properties.phrase, .confidence = 1};
+            wakeword_result res = ww.ww_inst->detect(_feature_samples);
+            if(res.detected) {
+                Lowwi_ctx_t cb = {.phrase = ww.properties.phrase, .confidence = res.confidence};
                 ww.properties.cbfunc(cb, ww.properties.cb_arg);
             }
         }
         _mel_samples.clear();
         _feature_samples.clear();
-        _raw_samples.clear();
     }
 
     Lowwi::~Lowwi()

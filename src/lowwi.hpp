@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * This file is part of the Openwakeword.Cpp library
+ * This file is part of the Lowwi library
  *
  * Author:          Victor Hogeweij <Hoog-V>
  *
@@ -32,30 +32,59 @@ namespace CLFML::LOWWI
 {
     typedef struct {
         const std::string phrase;
-        const int confidence;
-    }Lowwi_cb_t;
+        const float confidence;
+    }Lowwi_ctx_t;
 
     typedef struct
     {
         std::string phrase;
         const char *model_path;
-        std::function<void(Lowwi_cb_t, std::any)> cbfunc;
-        std::any cb_arg;
+        std::function<void(Lowwi_ctx_t, std::shared_ptr<void>)> cbfunc;
+        std::shared_ptr<void> cb_arg;
+        float refractory = 20.0f;
+        float threshold = 0.5f;
+        float min_activations = 5;
+        uint8_t debug = false;
     } Lowwi_word_t;
 
     class Lowwi
     {
     public:
-        Lowwi(const int mic_index);
-        void add_wakeword(const Lowwi_word_t lowwi_word);
-        void remove_wakeword(const std::string lowi_word_phrase);
-        void detect(const std::vector<float> &audio_samples);
+        Lowwi();
+
+        /**
+        * @brief Add new wakeword to detection runtime
+        * @param lowwi_word Struct with the properties 
+        *                   of the to be added wakeword
+        */
+        void add_wakeword(const Lowwi_word_t& lowwi_word);
+
+        /**
+         * @brief Remove wakeword from detection runtime
+         * @param model_path Model path of the to be removed wakeword
+         */
+        void remove_wakeword(const char* model_path);
+
+        /**
+         * @brief Runs wakeword detection runtime on audio samples
+         * @param audio_samples Audio samples to parse
+         */
+        void run(const std::vector<float> &audio_samples);
+
         ~Lowwi();
 
     private:
+        /**
+         * @brief Onnx runtime environment and session otpions
+         *        The melspectrogram, feature and wakeword models
+         *        all share the same environment and session options.
+         */
         Ort::Env _env;
         Ort::SessionOptions _session_opt;
-        std::vector<float> _raw_samples;
+
+        /**
+         * @brief Vectors for the melspectrogram & feature samples.
+         */
         std::vector<float> _mel_samples;
         std::vector<float> _feature_samples;
         

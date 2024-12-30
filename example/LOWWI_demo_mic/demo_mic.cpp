@@ -1,58 +1,97 @@
+/*
+ *  Copyright 2024 (C) Jeroen Veen <ducroq> & Victor Hogeweij <Hoog-V>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ * This file is part of the Lowwi library
+ *
+ * Author:          Victor Hogeweij <Hoog-V>
+ *
+ */
+
 #include <lowwi.hpp>
+#include <audio_async.hpp>
 #include <iostream>
-#include <fstream>
 #include <vector>
 #include <cstring>
 #include <cstdint>
-#include <lowwi.hpp>
-#include <SDL.h>
-#include <atomic>
-#include <thread>
 #include <csignal>
-#include <audio_async.hpp>
-// Atomic flag to signal when to exit
-std::atomic<bool> keepRunning(true);
+
+#define AUDIO_DEFAULT_MIC -1
+#define AUDIO_SAMPLE_RATE 16000
+
+
+// Flag to signal when to exit
+bool keepRunning= true;
 
 // Signal handler for SIGINT
 void signalHandler(int signum)
 {
-    std::cout << "Interrupt signal (" << signum << ") received. Exiting..." << std::endl;
     keepRunning = false;
 }
 
-void wakeword_callback(CLFML::LOWWI::Lowwi_cb_t ctx, std::any arg) {
+/**
+ * @brief Callback that's called when wakeword is triggered 
+ */
+void wakeword_callback(CLFML::LOWWI::Lowwi_ctx_t ctx, std::shared_ptr<void> arg)
+{
+    std::cout << "Hey! who said \"" << ctx.phrase << "\"?" << ", I am for " << ctx.confidence << " % certain, I heard something!\n";
 
-std::cout << "Hey! who said " << ctx.phrase << "?\n";
-/* Stop the audio */
-audio_async *audio_inst = std::any_cast<audio_async*>(arg); 
-if(audio_inst != nullptr) {
-    audio_inst->clear();
-}
+    auto audio = std::static_pointer_cast<audio_async>(arg);
+    /* Clear the wakeword part from audio, this makes sure we don't process the same audio */
+    audio->clear();
 }
 
-int main(int argc, char *argv[]) {
-     // Register signal handler
+int main(int argc, char *argv[])
+{
+    // Register signal handler
     std::signal(SIGINT, signalHandler);
-    audio_async audio(5*1000);
-    CLFML::LOWWI::Lowwi detector(0);
+    /* Create new audio_async recorder with 5 seconds of buffering space*/
+    std::shared_ptr<audio_async> audio = std::make_shared<audio_async>(5 * 1000);
+
+    /* Create new Lowwi runtime */
+    CLFML::LOWWI::Lowwi ww_runtime;
+
+    /* Create new wakeword */
     CLFML::LOWWI::Lowwi_word_t ww;
     ww.cbfunc = wakeword_callback;
-    ww.cb_arg = &audio;
+    ww.cb_arg = audio;
     ww.model_path = "wakeword.onnx";
     ww.phrase = "Hey Mycroft";
-    detector.add_wakeword(ww);
-    std::vector<float> audioBuffer;
-    audioBuffer.reserve(2560);
-    audio.init(-1, 16000);
-    audio.resume();
-    audio.clear();
+    
+    /* Add wakeword to ww-runtime */
+    ww_runtime.add_wakeword(ww);
+
+    /* Create audio buffer and reserve some space */
+    std::vector<float> audio_buffer;
+    audio_buffer.reserve(2560);
+
+    /* Init the audio on default microphone (-1) and with sample_rate of 16KHz */
+    audio->init(AUDIO_DEFAULT_MIC, AUDIO_SAMPLE_RATE);
+    /* Start audio capture */
+    audio->resume();
+    /* Clear any samples in queue */
+    audio->clear();
+
     while (keepRunning)
     {
-        audio.get(2000, audioBuffer);
-        detector.detect(audioBuffer);
-        audioBuffer.clear();
+        /* Get 2-seconds of audio */
+        audio->get(2000, audio_buffer);
+        /* Run the wakeword models */
+        ww_runtime.run(audio_buffer);
+        /* Clear the audio buffer */
+        audio_buffer.clear();
     }
-
 
     return 0;
 }
