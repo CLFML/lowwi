@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     CLFML::LOWWI::Lowwi_word_t ww;
     ww.cbfunc = wakeword_callback;
     ww.cb_arg = audio;
-    ww.model_path = "models/example_wakewords/hey_mycroft.onnx";
+    ww.model_path = std::filesystem::path("models/example_wakewords/hey_mycroft.onnx");
     ww.phrase = "Hey Mycroft";
     
     /* Add wakeword to ww-runtime */

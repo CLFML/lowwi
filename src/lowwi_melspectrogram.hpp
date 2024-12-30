@@ -23,6 +23,7 @@
 #define LOWWI_MELSPECTROGRAM_HPP
 #include <vector>
 #include "onnxruntime_cxx_api.h"
+#include <filesystem>
 
 namespace CLFML::LOWWI
 {
@@ -59,7 +60,7 @@ namespace CLFML::LOWWI
         std::vector<float> _samples_to_process;
         std::vector<float> _melspectrogram_out;
 
-        const char *_melspectrogram_model_path = "models/melspectrogram.onnx";
+        const std::filesystem::path _melspectrogram_model_path = "models/melspectrogram.onnx";
 
     };
 

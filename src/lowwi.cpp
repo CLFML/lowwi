@@ -40,9 +40,9 @@ namespace CLFML::LOWWI
         if(!lowwi_word.cbfunc) {
             throw std::runtime_error("[LOWI]: ERROR! No callback function defined for lowwi_word!");
         }
-        wakeword_t wakeword = {
-            .ww_inst = std::make_unique<WakeWord>(_env, _session_opt, lowwi_word.model_path, lowwi_word.threshold, lowwi_word.min_activations, lowwi_word.refractory, lowwi_word.debug),
-            .properties = lowwi_word,
+        wakeword_t wakeword {
+            std::make_unique<WakeWord>(_env, _session_opt, lowwi_word.model_path, lowwi_word.threshold, lowwi_word.min_activations, lowwi_word.refractory, lowwi_word.debug),
+            lowwi_word,
         };
         _wakewords.push_back(std::move(wakeword));
     }
@@ -62,7 +62,7 @@ namespace CLFML::LOWWI
         for (auto &ww : _wakewords) {
             wakeword_result res = ww.ww_inst->detect(_feature_samples);
             if(res.detected) {
-                Lowwi_ctx_t cb = {.phrase = ww.properties.phrase, .confidence = res.confidence};
+                Lowwi_ctx_t cb = {ww.properties.phrase, res.confidence};
                 ww.properties.cbfunc(cb, ww.properties.cb_arg);
             }
         }

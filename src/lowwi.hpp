@@ -35,17 +35,18 @@ namespace CLFML::LOWWI
         const float confidence;
     }Lowwi_ctx_t;
 
-    typedef struct
+    struct Lowwi_word_t
     {
-        std::string phrase;
-        const char *model_path;
-        std::function<void(Lowwi_ctx_t, std::shared_ptr<void>)> cbfunc;
-        std::shared_ptr<void> cb_arg;
-        float refractory = 20.0f;
+        std::string phrase = "";
+        std::filesystem::path model_path = std::filesystem::path("");
+        std::function<void(Lowwi_ctx_t, std::shared_ptr<void>)> cbfunc = nullptr;
+        std::shared_ptr<void> cb_arg = nullptr;
+        int refractory = 20;
         float threshold = 0.5f;
         float min_activations = 5;
         uint8_t debug = false;
-    } Lowwi_word_t;
+
+    } ;
 
     class Lowwi
     {

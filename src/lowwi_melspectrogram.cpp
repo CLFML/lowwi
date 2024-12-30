@@ -31,7 +31,7 @@ namespace CLFML::LOWWI
          * Create new session for our Onnx model
          * Also load the model in :)
          */
-        _session = std::make_unique<Ort::Session>(_env, _melspectrogram_model_path, _session_options);
+        _session = std::make_unique<Ort::Session>(_env, _melspectrogram_model_path.c_str(), _session_options);
     }
 
     std::vector<float> &Melspectrogram::convert(const std::vector<float> &audio_samples)

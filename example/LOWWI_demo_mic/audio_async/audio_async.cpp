@@ -218,7 +218,7 @@ void audio_async::get(int ms, std::vector<float> & result) {
 
         result.resize(n_samples);
 
-        int s0 = m_audio_pos - n_samples;
+        signed long long s0 = m_audio_pos - n_samples;
         if (s0 < 0) {
             s0 += m_audio.size();
         }

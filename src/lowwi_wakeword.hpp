@@ -24,6 +24,7 @@
 #include <cstdint>
 #include <vector>
 #include <onnxruntime_cxx_api.h>
+#include <filesystem>
 
 namespace CLFML::LOWWI
 {
@@ -51,10 +52,10 @@ namespace CLFML::LOWWI
          */
         WakeWord(Ort::Env &env, 
                  Ort::SessionOptions &session_options, 
-                 const char *model_path, 
+                 const std::filesystem::path model_path, 
                  const float threshold, 
                  const float min_activations, 
-                 const float refractory, 
+                 const int refractory, 
                  const uint8_t debug);
 
         /**
@@ -76,10 +77,10 @@ namespace CLFML::LOWWI
         std::vector<float> _samples_to_process;
         
         const uint8_t _debug = false;
-        const char *_model_path;
+        const std::filesystem::path _model_path;
         const float _threshold;
         const float _min_activations;
-        const float _refractory;
+        const int _refractory;
     };
 }
 

@@ -23,6 +23,8 @@
 #define LOWWI_EMBEDDING_HPP
 #include <vector>
 #include <onnxruntime_cxx_api.h>
+#include <filesystem>
+
 namespace CLFML::LOWWI
 {
 
@@ -58,7 +60,7 @@ namespace CLFML::LOWWI
         std::vector<float> _samples_to_process;
         std::vector<float> _embedding_out;
 
-        const char *_embedding_model_path = "models/embedding_model.onnx";
+        const std::filesystem::path _embedding_model_path = "models/embedding_model.onnx";
     };
 }
 #endif /* LOWWI_EMBEDDING_HPP */

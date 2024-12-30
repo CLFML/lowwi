@@ -27,7 +27,7 @@ namespace CLFML::LOWWI
                                                                                 _session_options(session_options),
                                                                                 _mem_info(Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeCPU))
     {
-        _session = std::make_unique<Ort::Session>(_env, _embedding_model_path, _session_options);
+        _session = std::make_unique<Ort::Session>(_env, _embedding_model_path.c_str(), _session_options);
     }
 
     std::vector<float> &Embedding::convert(const std::vector<float> &mels_in)

@@ -25,7 +25,7 @@
 namespace CLFML::LOWWI
 {
 
-    WakeWord::WakeWord(Ort::Env &env, Ort::SessionOptions &session_options, const char *model_path, const float threshold, const float min_activations, const float refractory, const uint8_t debug) : _env(env),
+    WakeWord::WakeWord(Ort::Env &env, Ort::SessionOptions &session_options, const std::filesystem::path model_path, const float threshold, const float min_activations, const int refractory, const uint8_t debug) : _env(env),
                                                                                                                                                                                                        _session_options(session_options),
                                                                                                                                                                                                        _mem_info(Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeCPU)),
                                                                                                                                                                                                        _threshold(threshold), _model_path(model_path), _debug(debug), _min_activations(min_activations), _refractory(refractory)
@@ -34,7 +34,7 @@ namespace CLFML::LOWWI
          * Create new session for our Onnx model
          * Also load the model in :)
          */
-        _session = std::make_unique<Ort::Session>(_env, _model_path, _session_options);
+        _session = std::make_unique<Ort::Session>(_env, _model_path.c_str(), _session_options);
     }
 
     wakeword_result WakeWord::detect(const std::vector<float> &features)
@@ -112,7 +112,7 @@ namespace CLFML::LOWWI
                     {
                         res.detected = 1; // Trigger level reached
                         activation = -_refractory; // Reset activation with refractory period
-                        sum_probability += float(probability*100);
+                        sum_probability += int(float(probability*100));
                         num_of_triggers++;
                     }
                 }
@@ -131,7 +131,7 @@ namespace CLFML::LOWWI
         }
 
         /* Calculate the avg probability or zero if no wakeword triggers */
-        res.confidence = (num_of_triggers > 0) ? (sum_probability/num_of_triggers) : 0;
+        res.confidence = (num_of_triggers > 0) ? float(sum_probability/num_of_triggers) : 0.0f;
 
         if (sample_idx > 0)
         {
