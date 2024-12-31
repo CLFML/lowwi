@@ -76,7 +76,7 @@ else()
         FetchContent_Declare(
             onnxruntime
             URL https://github.com/microsoft/onnxruntime/releases/download/v1.18.0/onnxruntime-linux-x64-1.18.0.tgz
-            SOURCE_DIR ${ONNX_PATH}
+            SOURCE_DIR ${ONNXRUNTIME_ROOTDIR}
         )
         FetchContent_MakeAvailable(onnxruntime)
         # Add ONNX library include files to include path
