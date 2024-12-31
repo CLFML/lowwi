@@ -1,18 +1,12 @@
-name: ci 
+name: code_compiles_on_linux
 on:
   push:
     branches:
       - main
+  pull_request:
+  workflow_dispatch: {}
 permissions:
   contents: write
-name: code_compiles
-
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-  workflow_dispatch: {}
 jobs:
   build:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
@@ -21,7 +15,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Install prerequired packages
       # To compile and run the code we require cmake, ninja and opencv

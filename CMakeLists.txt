@@ -91,10 +91,9 @@ endif()
 
 # Models have to be copied to executable directory
 set(MODELS_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/models)
-set(MODELS_DEST_DIR ${CMAKE_BINARY_DIR}/models)
 
 add_custom_target(copy_models ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${MODELS_SOURCE_DIR} $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${MODELS_SOURCE_DIR} $<TARGET_FILE_DIR:${PROJECT_NAME}>/models
     COMMENT "Copying models directory to build folder"
 )
 
