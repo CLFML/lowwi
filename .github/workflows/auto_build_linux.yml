@@ -18,7 +18,7 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Install prerequired packages
-      # To compile and run the code we require cmake, ninja and opencv
+      # To compile and run the code we require cmake, ninja and sdl2
       run:  sudo apt-get update && sudo apt-get install build-essential cmake ninja-build libsdl2-2.0-0 libsdl2-dev
 
     - name: Configure CMake
