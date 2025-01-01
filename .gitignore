@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+# Build & IDE folders
+.vscode/
+build/
+bin/
+Build/
+cmake-*/
+lib/
