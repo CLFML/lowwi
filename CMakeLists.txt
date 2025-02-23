@@ -171,7 +171,7 @@ if(CLFML_LOWWI_BUILD_EXAMPLE_PROJECTS)
 
         # Copy all dll_files of SDL2 to executable dir
         add_custom_target(copy_sdl2_dll ALL
-                          COMMAND ${CMAKE_COMMAND} -E copy ${sdl2_dll_files} $<TARGET_FILE_DIR:${PROJECT_NAME}>
+                          COMMAND ${CMAKE_COMMAND} -E copy ${sdl2_dll_files} $<TARGET_FILE_DIR:lowwi_lib>
                           COMMENT "Copying dll file to build folder"
                           )
     else()
@@ -193,7 +193,7 @@ if(CLFML_LOWWI_BUILD_EXAMPLE_PROJECTS)
   else ()
     # Example fragments for demo_fragments should be copied to executable dir too
     add_custom_target(copy_example_fragments ALL
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_fragment/example_fragments $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_fragment/example_fragments $<TARGET_FILE_DIR:lowwi_lib>
         COMMENT "Copying example fragments to build folder"
     )
     
@@ -205,7 +205,7 @@ if(CLFML_LOWWI_BUILD_EXAMPLE_PROJECTS)
                                   ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_mic/audio_async/audio_async.cpp)
     
     # Set the example fragments path
-    set(LOWWI_EXAMPLE_FRAGMENTS_PATH $<TARGET_FILE_DIR:${PROJECT_NAME}>/example_fragments)
+    set(LOWWI_EXAMPLE_FRAGMENTS_PATH $<TARGET_FILE_DIR:lowwi_lib>/example_fragments)
     target_compile_definitions(LOWWI_demo PUBLIC -DCLFML_LOWWI_EXAMPLE_FRAGMENTS="${LOWWI_EXAMPLE_FRAGMENTS_PATH}")
 
     # Link lowwi_lib demo's with lowwi_lib
