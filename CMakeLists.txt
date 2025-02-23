@@ -70,7 +70,7 @@ else()
 
         # Copy the DLL files to the executable dir.
         add_custom_target(copy_onnxruntime_dll ALL
-                          COMMAND ${CMAKE_COMMAND} -E copy ${onnx_dll_files} $<TARGET_FILE_DIR:${PROJECT_NAME}>
+                          COMMAND ${CMAKE_COMMAND} -E copy ${onnx_dll_files} $<TARGET_FILE_DIR:lowwi_lib>
                           COMMENT "Copying ONNX dll files to build folder"
                             )
     else()
