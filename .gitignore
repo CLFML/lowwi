@@ -38,3 +38,7 @@ bin/
 Build/
 cmake-*/
 lib/
+
+# ROS2 folders
+install/
+log/
