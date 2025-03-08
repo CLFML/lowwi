@@ -31,6 +31,15 @@ namespace CLFML::LOWWI
     class Melspectrogram
     {
     public:
+        /**
+          * @brief Prevent this class from being used with copy constructor
+          */
+         Melspectrogram(const Melspectrogram&) = delete;
+         
+        /**
+          * @brief Prevent this class from being used with assignment constructor
+          */
+         Melspectrogram& operator=(const Melspectrogram&) = delete;
 
         /**
          * @param env Reference to Onnx environment which the model will run in

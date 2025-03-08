@@ -31,6 +31,13 @@ add_library(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/src/lowwi.cpp
                             ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_embedding.cpp
                             ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_wakeword.cpp)
 target_compile_options(${PROJECT_NAME} PRIVATE "-Wall")
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    target_compile_options(${PROJECT_NAME} PRIVATE /wd4625  # Suppresses warning C4625
+                                                   /wd4526  # Suppresses warning C4626
+                                                   )
+endif()
+
 # Create alias CLFML::Lowi
 add_library(CLFML::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
