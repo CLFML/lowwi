@@ -34,7 +34,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE "-Wall")
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     target_compile_options(${PROJECT_NAME} PRIVATE /wd4625  # Suppresses warning C4625
-                                                   /wd4526  # Suppresses warning C4626
+                                                   /wd4626  # Suppresses warning C4626
                                                    )
 endif()
 
@@ -76,7 +76,7 @@ else()
                                                         /wd4514  # Suppresses warning C4514
                                                         /wd4710  # Suppresses warning C4710
                                                         /wd4625  # Suppresses warning C4625
-                                                        /wd4526  # Suppresses warning C4626
+                                                        /wd4626  # Suppresses warning C4626
                                                         /wd5045  # Suppresses warning C5045 (spectre)
                                                         /wd4365  # Supresses  warning C4365
                                                        )
