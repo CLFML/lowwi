@@ -60,6 +60,7 @@ namespace CLFML::LOWWI
      */
     struct Lowwi_word_t
     {
+        uint8_t debug = false;
         std::string phrase = "";
         std::filesystem::path model_path = std::filesystem::path("");
         std::function<void(Lowwi_ctx_t, std::shared_ptr<void>)> cbfunc = nullptr;
@@ -67,7 +68,6 @@ namespace CLFML::LOWWI
         int refractory = 20;
         float threshold = 0.5f;
         float min_activations = 5;
-        uint8_t debug = false;
     };
 
     class Lowwi

@@ -30,13 +30,23 @@ namespace CLFML::LOWWI
 {
     /* Wakeword result struct returned by the detect function */
     struct wakeword_result {
-        float confidence;
         uint8_t detected;
+        float confidence;
     };
 
     class WakeWord
     {
     public:
+        /**
+          * @brief Prevent this class from being used with copy constructor
+          */
+         WakeWord(const WakeWord&) = delete;
+         
+        /**
+          * @brief Prevent this class from being used with assignment constructor
+          */
+         WakeWord& operator=(const WakeWord&) = delete;
+
         /**
          * @brief Create new wakeword
          * @param env Onnx environment to run the model in

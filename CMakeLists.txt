@@ -68,7 +68,6 @@ else()
         target_compile_options(${PROJECT_NAME} PRIVATE /wd4820  # Suppresses warning C4820
                                                        /wd4514  # Suppresses warning C4514
                                                        /wd4710  # Suppresses warning C4710
-                                                       /wd4626  # Suppresses warning C4625
                                                        /Qspectre # Enable spectre vulnerability mitigations
                                                        )
 
