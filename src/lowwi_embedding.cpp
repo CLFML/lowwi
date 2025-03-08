@@ -82,7 +82,13 @@ namespace CLFML::LOWWI
             const float *emb_out_data = emb_out.GetTensorData<float>();
 
             /* Small gotcha! Reserving before copy saves so much time! */
-            size_t emb_out_count = emb_shape.at(3);
+            int64_t emb_out_count = emb_shape.at(3);
+
+            /* Return early if we got a negative number, which would cause severe memory issues! */
+            if(emb_out_count < 0) {
+                return _embedding_out;
+            }
+
             _embedding_out.reserve(_embedding_out.size() + emb_out_count);
 
             /* Copy the embedding data from output tensor to internal buffer */

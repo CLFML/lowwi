@@ -64,7 +64,7 @@ namespace CLFML::LOWWI
                  Ort::SessionOptions &session_options, 
                  const std::filesystem::path model_path, 
                  const float threshold, 
-                 const float min_activations, 
+                 const uint32_t min_activations, 
                  const int refractory, 
                  const uint8_t debug);
 
@@ -89,7 +89,7 @@ namespace CLFML::LOWWI
         uint8_t _debug = false;
         const std::filesystem::path _model_path;
         const float _threshold;
-        const float _min_activations;
+        const uint32_t _min_activations;
         const int _refractory;
     };
 }

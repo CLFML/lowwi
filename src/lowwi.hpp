@@ -67,7 +67,7 @@ namespace CLFML::LOWWI
         std::shared_ptr<void> cb_arg = nullptr;
         int refractory = 20;
         float threshold = 0.5f;
-        float min_activations = 5;
+        uint32_t min_activations = 5;
     };
 
     class Lowwi

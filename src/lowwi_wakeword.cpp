@@ -27,7 +27,7 @@ namespace CLFML::LOWWI
 
     WakeWord::WakeWord(Ort::Env &env, Ort::SessionOptions &session_options,
                        const std::filesystem::path model_path, const float threshold,
-                       const float min_activations, const int refractory, const uint8_t debug)
+                       const uint32_t min_activations, const int refractory, const uint8_t debug)
         : _env(env),
           _session_options(session_options),
           _session(nullptr), // Initialize session as nullptr (it will be assigned later)
@@ -63,7 +63,7 @@ namespace CLFML::LOWWI
         std::copy(features.begin(), features.end(), std::back_inserter(_samples_to_process));
 
         /* Used for scoring the wakeword probability/confidence */
-        int activation = 0;
+        uint32_t activation = 0;
         int num_of_triggers = 0;
         int sum_probability = 0;
 
