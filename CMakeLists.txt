@@ -65,7 +65,7 @@ else()
         target_link_libraries(${PROJECT_NAME} onnxruntime onnxruntime_providers_shared)
 
         # Turn off some compile warnings which are windows specific (but not fixable, due to it being an ONNX problem)
-        target_compile_options(${PROJECT_NAME} PRIVATE /wd4820  # Suppresses warning C4820
+        target_compile_options(${PROJECT_NAME} PUBLIC  /wd4820  # Suppresses warning C4820
                                                        /wd4514  # Suppresses warning C4514
                                                        /wd4710  # Suppresses warning C4710
                                                        /Qspectre # Enable spectre vulnerability mitigations
