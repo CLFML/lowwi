@@ -96,7 +96,8 @@ namespace CLFML::LOWWI
 
             /* Scale/normalize the melspectrogram to range required for Google embedding model
              * See the paper for this model here: https://arxiv.org/abs/2002.01322
-            /* Now values will be in range 1.0 to 6.0 dB instead of -10.0 to 40.0 dB */
+             * Now values will be in range 1.0 to 6.0 dB instead of -10.0 to 40.0 dB 
+             */
             std::transform(mel_data, mel_data + mel_count, std::back_inserter(_melspectrogram_out),
                            [](float val)
                            { return (val / 10.0f) + 2.0f; });

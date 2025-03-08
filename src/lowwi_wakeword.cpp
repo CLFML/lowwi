@@ -25,15 +25,22 @@
 namespace CLFML::LOWWI
 {
 
-    WakeWord::WakeWord(Ort::Env &env, Ort::SessionOptions &session_options, const std::filesystem::path model_path, const float threshold, const float min_activations, const int refractory, const uint8_t debug) : _env(env),
-                                                                                                                                                                                                       _session_options(session_options),
-                                                                                                                                                                                                       _mem_info(Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeCPU)),
-                                                                                                                                                                                                       _threshold(threshold), _model_path(model_path), _debug(debug), _min_activations(min_activations), _refractory(refractory)
+    WakeWord::WakeWord(Ort::Env &env, Ort::SessionOptions &session_options,
+                       const std::filesystem::path model_path, const float threshold,
+                       const float min_activations, const int refractory, const uint8_t debug)
+        : _env(env),
+          _session_options(session_options),
+          _session(nullptr), // Initialize session as nullptr (it will be assigned later)
+          _mem_info(Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeCPU)),
+          _allocator(),
+          _samples_to_process(),
+          _debug(debug),
+          _model_path(model_path),
+          _threshold(threshold),
+          _min_activations(min_activations),
+          _refractory(refractory)
     {
-        /*
-         * Create new session for our Onnx model
-         * Also load the model in :)
-         */
+        // Now initialize _session properly
         _session = std::make_unique<Ort::Session>(_env, _model_path.c_str(), _session_options);
     }
 
@@ -45,9 +52,9 @@ namespace CLFML::LOWWI
         {
             return res;
         }
-        
+
         /* Reserve the space for the samples */
-        _samples_to_process.reserve(features.size()+_samples_to_process.size());
+        _samples_to_process.reserve(features.size() + _samples_to_process.size());
 
         /* Copy the melspectrogram samples to internal buffer */
         _samples_to_process.insert(_samples_to_process.end(), features.begin(), features.end());
@@ -110,9 +117,9 @@ namespace CLFML::LOWWI
                     // Increment activation and check trigger
                     if (++activation >= _min_activations)
                     {
-                        res.detected = 1; // Trigger level reached
+                        res.detected = 1;          // Trigger level reached
                         activation = -_refractory; // Reset activation with refractory period
-                        sum_probability += int(float(probability*100));
+                        sum_probability += int(float(probability * 100));
                         num_of_triggers++;
                     }
                 }
@@ -131,7 +138,7 @@ namespace CLFML::LOWWI
         }
 
         /* Calculate the avg probability or zero if no wakeword triggers */
-        res.confidence = (num_of_triggers > 0) ? float(sum_probability/num_of_triggers) : 0.0f;
+        res.confidence = (num_of_triggers > 0) ? float(sum_probability / num_of_triggers) : 0.0f;
 
         if (sample_idx > 0)
         {

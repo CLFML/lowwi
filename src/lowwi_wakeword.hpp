@@ -76,7 +76,7 @@ namespace CLFML::LOWWI
 
         std::vector<float> _samples_to_process;
         
-        const uint8_t _debug = false;
+        uint8_t _debug = false;
         const std::filesystem::path _model_path;
         const float _threshold;
         const float _min_activations;

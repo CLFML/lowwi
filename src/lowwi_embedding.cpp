@@ -48,7 +48,6 @@ namespace CLFML::LOWWI
         const size_t _embedding_window_size = 76;
         const size_t _embedding_mels_per_frame = 32; // fixed by model
         const size_t _embedding_step_size = 8;       // 80 ms
-        const size_t _embedding_frame_size = 1280 * 4;
 
         /* Calculate the amount of mel_frames to process */
         size_t mel_frames = _samples_to_process.size() / _embedding_mels_per_frame;

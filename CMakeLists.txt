@@ -30,6 +30,7 @@ add_library(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/src/lowwi.cpp
                             ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_melspectrogram.cpp
                             ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_embedding.cpp
                             ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_wakeword.cpp)
+target_compile_options(${PROJECT_NAME} PRIVATE "-Wall")
 # Create alias CLFML::Lowi
 add_library(CLFML::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
@@ -143,7 +144,7 @@ if(CLFML_LOWWI_BUILD_EXAMPLE_PROJECTS)
                                   ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_mic/audio_async/audio_async.cpp)
     
     # Set the example fragments path
-    set(LOWWI_EXAMPLE_FRAGMENTS_PATH $<TARGET_FILE_DIR:${PROJECT_NAME}>/example_fragments)
+    set(LOWWI_EXAMPLE_FRAGMENTS_PATH $<TARGET_FILE_DIR:${PROJECT_NAME}>)
     target_compile_definitions(LOWWI_demo PUBLIC -DCLFML_LOWWI_EXAMPLE_FRAGMENTS="${LOWWI_EXAMPLE_FRAGMENTS_PATH}")
 
     # Link Lowwi demo's with Lowwi
