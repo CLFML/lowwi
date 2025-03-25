@@ -42,3 +42,9 @@ lib/
 # ROS2 folders
 install/
 log/
+
+# Pixi folders
+.pixi/
+
+# Pixi lock file
+pixi.lock
