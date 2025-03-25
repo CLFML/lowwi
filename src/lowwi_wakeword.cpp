@@ -69,8 +69,10 @@ namespace CLFML::LOWWI
         while (num_features >= _wakeword_feature_window)
         {
             /* Model constants */
-            const std::array<const char *, 1> _input_names{"onnx::Flatten_0"};
-            const std::array<const char *, 1> _output_names{"39"};
+            auto model_input_name = _session->GetInputNameAllocated(0, _allocator);
+            auto model_output_name = _session->GetOutputNameAllocated(0, _allocator);
+            const std::array<const char *, 1> _input_names = {model_input_name.get()};
+            const std::array<const char *, 1> _output_names{model_output_name.get()};
             const std::array<int64_t, 3> _input_shape{1, (int64_t)16, 96};
 
             /* Create input tensor from data & input shape */
