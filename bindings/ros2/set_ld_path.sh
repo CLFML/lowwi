@@ -7,7 +7,7 @@ if [ ! -d "install" ]; then
 fi
 
 # Path to the dynamic library
-LIB_PATH="$(pwd)/lib/*/lib/libonnxruntime.so"
+LIB_PATH="$(pwd)/lib/*/libonnxruntime.so"
 
 # Check if the dynamic library exists
 if [ -f "$LIB_PATH" ]; then

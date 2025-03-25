@@ -1,3 +1,0 @@
-int32 duration_ms  # Requested duration in milliseconds
----
-std_msgs/Float32MultiArray audio_samples  # Audio data response
