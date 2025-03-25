@@ -11,14 +11,13 @@
     - Written with performance in mind, less than 3% CPU utilization on x86/64 CPUs
   </description>
 
-  <maintainer email="jveen1@gmail.com">jeroen</maintainer>
+  <maintainer email="hogeweyv@gmail.com">Hoog-v</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
   <depend>std_srvs</depend>
-  <depend>v4l2_camera</depend>
   
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
