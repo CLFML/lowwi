@@ -1,0 +1,7 @@
+{
+    "name": "lowwi",
+    "cmake-args":[
+        "-DCLFML_LOWWI_ROS2_PACKAGE_BUILD=ON",
+        "-G Ninja"
+    ]
+}
