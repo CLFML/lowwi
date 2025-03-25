@@ -106,9 +106,7 @@ if (CLFML_LOWWI_ROS2_PACKAGE_BUILD)
   find_package(rosidl_default_generators REQUIRED)
   find_package(std_msgs REQUIRED)
   find_package(std_srvs REQUIRED)
-  find_package(SDL2)
   find_package(audio_tools)
-  target_link_libraries(lowwi_lib ${cv_bridge_LIBRARIES})
   add_executable(lowwi_node ${CMAKE_CURRENT_LIST_DIR}/bindings/ros2/lowwi_node.cpp)
   rosidl_generate_interfaces(${PROJECT_NAME}
   bindings/ros2/msg/WakeWord.msg
