@@ -30,13 +30,23 @@ namespace CLFML::LOWWI
 {
     /* Wakeword result struct returned by the detect function */
     struct wakeword_result {
-        float confidence;
         uint8_t detected;
+        float confidence;
     };
 
     class WakeWord
     {
     public:
+        /**
+          * @brief Prevent this class from being used with copy constructor
+          */
+         WakeWord(const WakeWord&) = delete;
+         
+        /**
+          * @brief Prevent this class from being used with assignment constructor
+          */
+         WakeWord& operator=(const WakeWord&) = delete;
+
         /**
          * @brief Create new wakeword
          * @param env Onnx environment to run the model in
@@ -54,7 +64,7 @@ namespace CLFML::LOWWI
                  Ort::SessionOptions &session_options, 
                  const std::filesystem::path model_path, 
                  const float threshold, 
-                 const float min_activations, 
+                 const uint32_t min_activations, 
                  const int refractory, 
                  const uint8_t debug);
 
@@ -76,10 +86,10 @@ namespace CLFML::LOWWI
 
         std::vector<float> _samples_to_process;
         
-        const uint8_t _debug = false;
+        uint8_t _debug = false;
         const std::filesystem::path _model_path;
         const float _threshold;
-        const float _min_activations;
+        const uint32_t _min_activations;
         const int _refractory;
     };
 }

@@ -32,6 +32,16 @@ namespace CLFML::LOWWI
     {
     public:
         /**
+          * @brief Prevent this class from being used with copy constructor
+          */
+         Embedding(const Embedding&) = delete;
+         
+        /**
+          * @brief Prevent this class from being used with assignment constructor
+          */
+         Embedding& operator=(const Embedding&) = delete;
+
+        /**
          * @param env Reference to Onnx environment which the model will run in
          * @param session_options Reference to Onnx options which configure the session for this model
          */
