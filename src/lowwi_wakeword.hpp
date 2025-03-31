@@ -50,10 +50,8 @@ public:
    * @param debug      Prints the confidence factor (even when word is not
    * triggered) to console.
    */
-  WakeWord(Ort::Env &env, Ort::SessionOptions &session_options,
-           const std::filesystem::path model_path, const float threshold,
-           const float min_activations, const int refractory,
-           const uint8_t debug);
+  WakeWord(Ort::Env &env, Ort::SessionOptions &session_options, const std::filesystem::path model_path,
+           const float threshold, const float min_activations, const int refractory, const uint8_t debug);
 
   /**
    * @brief Runs the wakeword model on the features

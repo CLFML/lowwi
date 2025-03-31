@@ -22,43 +22,34 @@
 #include "lowwi_melspectrogram.hpp"
 
 namespace CLFML::LOWWI {
-Melspectrogram::Melspectrogram(Ort::Env &env,
-                               Ort::SessionOptions &session_options)
+Melspectrogram::Melspectrogram(Ort::Env &env, Ort::SessionOptions &session_options)
     : _env(env), _session_options(session_options),
-      _mem_info(Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator,
-                                           OrtMemType::OrtMemTypeCPU)) {
+      _mem_info(Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeCPU)) {
 #ifdef CLFML_LOWWI_CONDA_PACKAGING
   // Get the CONDA_PREFIX environment variable
   const char *condapath = std::getenv("CONDA_PREFIX");
   if (condapath) {
     // Prepend CONDA_PREFIX to the model path if the environment variable is set
-    std::filesystem::path model_path = std::filesystem::path(condapath) /
-                                       "lib" / "lowwi" /
-                                       _melspectrogram_model_path;
+    std::filesystem::path model_path = std::filesystem::path(condapath) / "lib" / "lowwi" / _melspectrogram_model_path;
 
     // Now use model_path to create a session
-    _session = std::make_unique<Ort::Session>(_env, model_path.c_str(),
-                                              _session_options);
+    _session = std::make_unique<Ort::Session>(_env, model_path.c_str(), _session_options);
   } else {
     // Handle the case when the CONDA_PREFIX environment variable is not set
     printf("CONDA_PREFIX environment variable is not set!\n");
     // Handle error or default model path logic
-    _session = std::make_unique<Ort::Session>(
-        _env, _melspectrogram_model_path.c_str(), _session_options);
+    _session = std::make_unique<Ort::Session>(_env, _melspectrogram_model_path.c_str(), _session_options);
   }
 #else
   // Default logic when CLFML_LOWWI_CONDA_PACKAGING is not defined
-  _session = std::make_unique<Ort::Session>(
-      _env, _melspectrogram_model_path.c_str(), _session_options);
+  _session = std::make_unique<Ort::Session>(_env, _melspectrogram_model_path.c_str(), _session_options);
 #endif
 }
 
-std::vector<float> &
-Melspectrogram::convert(const std::vector<float> &audio_samples) {
+std::vector<float> &Melspectrogram::convert(const std::vector<float> &audio_samples) {
   _melspectrogram_out.resize(0);
 
-  _samples_to_process.reserve(audio_samples.size() +
-                              _samples_to_process.size());
+  _samples_to_process.reserve(audio_samples.size() + _samples_to_process.size());
 
   /*
    * This could have been done without copying.
@@ -69,8 +60,7 @@ Melspectrogram::convert(const std::vector<float> &audio_samples) {
    * CPU with DDR4. This is almost negligible. But might be interesting to
    * profile in the near future, when doing further optimizations.
    */
-  _samples_to_process.insert(_samples_to_process.end(), audio_samples.begin(),
-                             audio_samples.end());
+  _samples_to_process.insert(_samples_to_process.end(), audio_samples.begin(), audio_samples.end());
 
   size_t start_idx = 0;
 
@@ -89,14 +79,13 @@ Melspectrogram::convert(const std::vector<float> &audio_samples) {
    */
   while (start_idx + _melspectrogram_frame_size <= _samples_to_process.size()) {
     /* Load in the samples in to our model inputs */
-    auto input_tensor = Ort::Value::CreateTensor<float>(
-        _mem_info, &_samples_to_process[start_idx], _melspectrogram_frame_size,
-        _input_shape.data(), _input_shape.size());
+    auto input_tensor =
+        Ort::Value::CreateTensor<float>(_mem_info, &_samples_to_process[start_idx], _melspectrogram_frame_size,
+                                        _input_shape.data(), _input_shape.size());
 
     /* Run model inference and save the melspectrogram output */
-    auto output_tensors = _session->Run(
-        Ort::RunOptions{nullptr}, _input_names.data(), &input_tensor,
-        _input_names.size(), _output_names.data(), _output_names.size());
+    auto output_tensors = _session->Run(Ort::RunOptions{nullptr}, _input_names.data(), &input_tensor,
+                                        _input_names.size(), _output_names.data(), _output_names.size());
     /* Get the output tensor */
     const auto &mel_out = output_tensors.front();
     const auto mel_shape = mel_out.GetTensorTypeAndShapeInfo().GetShape();
@@ -115,16 +104,14 @@ Melspectrogram::convert(const std::vector<float> &audio_samples) {
      * model
      * See the paper for this model here: https://arxiv.org/abs/2002.01322
     /* Now values will be in range 1.0 to 6.0 dB instead of -10.0 to 40.0 dB */
-    std::transform(mel_data, mel_data + mel_count,
-                   std::back_inserter(_melspectrogram_out),
+    std::transform(mel_data, mel_data + mel_count, std::back_inserter(_melspectrogram_out),
                    [](float val) { return (val / 10.0f) + 2.0f; });
 
     start_idx += _melspectrogram_frame_size;
   }
 
   if (start_idx > 0) {
-    _samples_to_process.erase(_samples_to_process.begin(),
-                              _samples_to_process.begin() + start_idx);
+    _samples_to_process.erase(_samples_to_process.begin(), _samples_to_process.begin() + start_idx);
   }
   return _melspectrogram_out;
 }

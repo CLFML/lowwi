@@ -24,21 +24,17 @@
 
 namespace CLFML::LOWWI {
 
-WakeWord::WakeWord(Ort::Env &env, Ort::SessionOptions &session_options,
-                   const std::filesystem::path model_path,
-                   const float threshold, const float min_activations,
-                   const int refractory, const uint8_t debug)
+WakeWord::WakeWord(Ort::Env &env, Ort::SessionOptions &session_options, const std::filesystem::path model_path,
+                   const float threshold, const float min_activations, const int refractory, const uint8_t debug)
     : _env(env), _session_options(session_options),
-      _mem_info(Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator,
-                                           OrtMemType::OrtMemTypeCPU)),
-      _threshold(threshold), _model_path(model_path), _debug(debug),
-      _min_activations(min_activations), _refractory(refractory) {
+      _mem_info(Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeCPU)),
+      _threshold(threshold), _model_path(model_path), _debug(debug), _min_activations(min_activations),
+      _refractory(refractory) {
   /*
    * Create new session for our Onnx model
    * Also load the model in :)
    */
-  _session = std::make_unique<Ort::Session>(_env, _model_path.c_str(),
-                                            _session_options);
+  _session = std::make_unique<Ort::Session>(_env, _model_path.c_str(), _session_options);
 }
 
 wakeword_result WakeWord::detect(const std::vector<float> &features) {
@@ -52,12 +48,10 @@ wakeword_result WakeWord::detect(const std::vector<float> &features) {
   _samples_to_process.reserve(features.size() + _samples_to_process.size());
 
   /* Copy the melspectrogram samples to internal buffer */
-  _samples_to_process.insert(_samples_to_process.end(), features.begin(),
-                             features.end());
+  _samples_to_process.insert(_samples_to_process.end(), features.begin(), features.end());
 
   /* Copy features to internal buffer for further processing */
-  std::copy(features.begin(), features.end(),
-            std::back_inserter(_samples_to_process));
+  std::copy(features.begin(), features.end(), std::back_inserter(_samples_to_process));
 
   /* Used for scoring the wakeword probability/confidence */
   int activation = 0;
@@ -69,8 +63,7 @@ wakeword_result WakeWord::detect(const std::vector<float> &features) {
   const size_t _wakeword_samples_per_feature = 96;
 
   size_t sample_idx = 0;
-  size_t num_features =
-      _samples_to_process.size() / _wakeword_samples_per_feature;
+  size_t num_features = _samples_to_process.size() / _wakeword_samples_per_feature;
   while (num_features >= _wakeword_feature_window) {
     /* Model constants */
     auto model_input_name = _session->GetInputNameAllocated(0, _allocator);
@@ -80,14 +73,12 @@ wakeword_result WakeWord::detect(const std::vector<float> &features) {
     const std::array<int64_t, 3> _input_shape{1, (int64_t)16, 96};
 
     /* Create input tensor from data & input shape */
-    auto input_tensor = Ort::Value::CreateTensor<float>(
-        _mem_info, &_samples_to_process.at(sample_idx),
-        (_wakeword_samples_per_feature * _wakeword_feature_window),
-        _input_shape.data(), _input_shape.size());
+    auto input_tensor = Ort::Value::CreateTensor<float>(_mem_info, &_samples_to_process.at(sample_idx),
+                                                        (_wakeword_samples_per_feature * _wakeword_feature_window),
+                                                        _input_shape.data(), _input_shape.size());
 
     auto output_tensors =
-        _session->Run(Ort::RunOptions{nullptr}, _input_names.data(),
-                      &input_tensor, 1, _output_names.data(), 1);
+        _session->Run(Ort::RunOptions{nullptr}, _input_names.data(), &input_tensor, 1, _output_names.data(), 1);
 
     /* Get the output tensor */
     const auto &ww_out = output_tensors.front();
@@ -122,18 +113,15 @@ wakeword_result WakeWord::detect(const std::vector<float> &features) {
     sample_idx += _wakeword_samples_per_feature;
 
     /* Calculate new num_features */
-    num_features = (_samples_to_process.size() - sample_idx) /
-                   _wakeword_samples_per_feature;
+    num_features = (_samples_to_process.size() - sample_idx) / _wakeword_samples_per_feature;
   }
 
   /* Calculate the avg probability or zero if no wakeword triggers */
-  res.confidence =
-      (num_of_triggers > 0) ? float(sum_probability / num_of_triggers) : 0.0f;
+  res.confidence = (num_of_triggers > 0) ? float(sum_probability / num_of_triggers) : 0.0f;
 
   if (sample_idx > 0) {
     /* erase all processed features */
-    _samples_to_process.erase(_samples_to_process.begin(),
-                              _samples_to_process.begin() + sample_idx);
+    _samples_to_process.erase(_samples_to_process.begin(), _samples_to_process.begin() + sample_idx);
   }
 
   return res;
