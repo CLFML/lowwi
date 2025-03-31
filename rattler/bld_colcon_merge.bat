@@ -28,7 +28,6 @@ colcon build ^
     --merge-install ^
     --install-base %LIBRARY_PREFIX% ^
     --cmake-args ^
-    --compile-no-warning-as-error ^
      -DCMAKE_BUILD_TYPE=Release ^
      -DBUILD_TESTING=OFF ^
      -DCLFML_LOWWI_CONDA_PACKAGING=ON ^

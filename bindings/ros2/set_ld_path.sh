@@ -16,5 +16,5 @@ if [ -f "$LIB_PATH" ]; then
     # Get the directory path of the library
     LIB_DIR=$(dirname "$LIB_PATH")
 
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIB_DIR
+    export LD_LIBRARY_PATH=$LIB_DIR:$LD_LIBRARY_PATH
 fi
