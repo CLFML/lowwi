@@ -8,6 +8,7 @@ option(CLFML_LOWWI_BUILD_EXAMPLE_PROJECTS "Build example projects" ON)
 # Optionally enable ROS2 package build (Requires ROS2 jazzy to be installed!)
 option(CLFML_LOWWI_ROS2_PACKAGE_BUILD "Build a ROS2 package" OFF)
 
+# Used when building Conda package to allow adding conda_prefix path to models dir
 option(CLFML_LOWWI_CONDA_PACKAGING "Build as conda package" OFF)
 
 # Internal flag used to determine whether or not to build examples automatically
@@ -151,9 +152,15 @@ if(CLFML_LOWWI_ROS2_PACKAGE_BUILD)
 
     target_link_libraries(lowwi_node lowwi_lib ${audio_tools_LIBRARIES})
     target_include_directories(lowwi_node PUBLIC ${audio_tools_INCLUDE_DIRS})
-    # Get list of all so files in the onnxruntime lib directory
-    file(GLOB onnx_so_files ${ONNXRUNTIME_ROOTDIR}/lib/*.so*)
-    install(FILES ${onnx_so_files} DESTINATION lib/)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+        # Get list of all so files in the onnxruntime lib directory
+        file(GLOB onnx_so_files ${ONNXRUNTIME_ROOTDIR}/lib/*.so*)
+        install(FILES ${onnx_so_files} DESTINATION lib/)
+    else()
+        # Get all dll files in SDL2 library folder
+        file(GLOB onnx_dll_files ${CMAKE_CURRENT_LIST_DIR}/lib/*.dll)
+        install(FILES ${onnx_dll_files} DESTINATION lib/)
+    endif()
     # Set the example fragments path
     set(LOWWI_EXAMPLE_FRAGMENTS_PATH ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_fragment/example_fragments)
     target_compile_definitions(lowwi_lib PUBLIC -DCLFML_LOWWI_EXAMPLE_FRAGMENTS="${LOWWI_EXAMPLE_FRAGMENTS_PATH}")
