@@ -13,3 +13,5 @@
 @set "ROS_ETC_DIR=%CONDA_PREFIX%\Library\etc\ros"
 @set "AMENT_PREFIX_PATH=%CONDA_PREFIX%\Library"
 @set "AMENT_PYTHON_EXECUTABLE=%CONDA_PREFIX%\python.exe"
+:: Add Conda's 'Library\bin' directory to PATH to prioritize Conda's libonnx
+@set "PATH=%CONDA_PREFIX%\Library\bin;%PATH%"
