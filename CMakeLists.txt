@@ -34,6 +34,14 @@ add_library(lowwi_lib ${CMAKE_CURRENT_LIST_DIR}/src/lowwi.cpp
                             ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_melspectrogram.cpp
                             ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_embedding.cpp
                             ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_wakeword.cpp)
+target_compile_options(${PROJECT_NAME} PRIVATE "-Wall")
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    target_compile_options(${PROJECT_NAME} PRIVATE /wd4625  # Suppresses warning C4625
+                                                   /wd4626  # Suppresses warning C4626
+                                                   )
+endif()
+
 # Create alias CLFML::Lowi
 add_library(CLFML::lowwi ALIAS lowwi_lib)
 
@@ -66,6 +74,16 @@ else()
 
         # Link the specific .lib file libraries to LOWWI
         target_link_libraries(lowwi_lib onnxruntime onnxruntime_providers_shared)
+
+        # Turn off some compile warnings which are windows specific (but not fixable, due to it being an ONNX problem)
+        target_compile_options(${PROJECT_NAME} PRIVATE  /wd4820  # Suppresses warning C4820
+                                                        /wd4514  # Suppresses warning C4514
+                                                        /wd4710  # Suppresses warning C4710
+                                                        /wd4625  # Suppresses warning C4625
+                                                        /wd4626  # Suppresses warning C4626
+                                                        /wd5045  # Suppresses warning C5045 (spectre)
+                                                        /wd4365  # Supresses  warning C4365
+                                                       )
 
         # Get list of all dll files in the onnxruntime lib directory
         file(GLOB onnx_dll_files ${ONNXRUNTIME_ROOTDIR}/lib/*.dll)
@@ -201,7 +219,7 @@ if(CLFML_LOWWI_BUILD_EXAMPLE_PROJECTS)
                                   ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_mic/audio_async/audio_async.cpp)
     
     # Set the example fragments path
-    set(LOWWI_EXAMPLE_FRAGMENTS_PATH $<TARGET_FILE_DIR:lowwi_lib>/example_fragments)
+    set(LOWWI_EXAMPLE_FRAGMENTS_PATH $<TARGET_FILE_DIR:${PROJECT_NAME}>)
     target_compile_definitions(LOWWI_demo PUBLIC -DCLFML_LOWWI_EXAMPLE_FRAGMENTS="${LOWWI_EXAMPLE_FRAGMENTS_PATH}")
 
     # Link lowwi_lib demo's with lowwi_lib

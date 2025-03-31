@@ -41,35 +41,33 @@ typedef struct {
   const float confidence;
 } Lowwi_ctx_t;
 
-/**
- * @brief The user-provided struct which provides the classifier model settings
- * @param phrase The model identifier which get's passed into the callback
- * function when triggered.
- * @param model_path The classifier model path
- * @param cbfunc Function pointer to a callback function that get's called when
- * wakeword is triggered
- * @param cb_arg Additional function argument that get's passed in the callback
- * when wakeword is triggered (void pointer)
- * @param refractory The negative feedback on activation, when activated this
- * factor makes the debouncing work :) Increasing it gives a higher negative
- * bounty, thus dampening any further activations. (Default = 20)
- *
- * @param threshold The threshold determines whether model confidence is worth
- * acting on (default = 0.5f)
- * @param min_activations Number of activations the model should have to be
- * considered detected (Default = 5, but depends on how well the model is
- * trained and how easy to detect) (It's like a debouncing system)
- */
-struct Lowwi_word_t {
-  std::string phrase = "";
-  std::filesystem::path model_path = std::filesystem::path("");
-  std::function<void(Lowwi_ctx_t, std::shared_ptr<void>)> cbfunc = nullptr;
-  std::shared_ptr<void> cb_arg = nullptr;
-  int refractory = 20;
-  float threshold = 0.5f;
-  float min_activations = 5;
-  uint8_t debug = false;
-};
+    /**
+     * @brief The user-provided struct which provides the classifier model settings
+     * @param phrase The model identifier which get's passed into the callback function when triggered.
+     * @param model_path The classifier model path
+     * @param cbfunc Function pointer to a callback function that get's called when wakeword is triggered
+     * @param cb_arg Additional function argument that get's passed in the callback when wakeword is triggered
+     *               (void pointer)
+     * @param refractory The negative feedback on activation, when activated this factor makes the debouncing work :)
+     *                   Increasing it gives a higher negative bounty, thus dampening any further activations.
+     *                   (Default = 20)
+     *
+     * @param threshold The threshold determines whether model confidence is worth acting on (default = 0.5f)
+     * @param min_activations Number of activations the model should have to be considered detected
+     *                       (Default = 5, but depends on how well the model is trained and how easy to detect)
+     *                       (It's like a debouncing system)
+     */
+    struct Lowwi_word_t
+    {
+        uint8_t debug = false;
+        std::string phrase = "";
+        std::filesystem::path model_path = std::filesystem::path("");
+        std::function<void(Lowwi_ctx_t, std::shared_ptr<void>)> cbfunc = nullptr;
+        std::shared_ptr<void> cb_arg = nullptr;
+        int refractory = 20;
+        float threshold = 0.5f;
+        uint32_t min_activations = 5;
+    };
 
 class Lowwi {
 public:

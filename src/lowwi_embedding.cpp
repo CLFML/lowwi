@@ -86,6 +86,15 @@ std::vector<float> &Embedding::convert(const std::vector<float> &mels_in) {
     /* Get the output tensor */
     const auto &emb_out = output_tensors.front();
     const auto emb_shape = emb_out.GetTensorTypeAndShapeInfo().GetShape();
+            /* Small gotcha! Reserving before copy saves so much time! */
+            int64_t emb_out_count = emb_shape.at(3);
+
+            /* Return early if we got a negative number, which would cause severe memory issues! */
+            if(emb_out_count < 0) {
+                return _embedding_out;
+            }
+
+            _embedding_out.reserve(_embedding_out.size() + emb_out_count);
 
     /* Get one dimensional representation of the embedding data */
     const float *emb_out_data = emb_out.GetTensorData<float>();

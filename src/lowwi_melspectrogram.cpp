@@ -97,8 +97,18 @@ std::vector<float> &Melspectrogram::convert(const std::vector<float> &audio_samp
      * do cross-product */
     size_t mel_count = (mel_shape.at(2) * mel_shape.at(3));
 
+<<<<<<< HEAD
     /* Reserve space beforehand, doing it dynamically in loop is stupid */
     _melspectrogram_out.reserve(_melspectrogram_out.size() + mel_count);
+=======
+            /* Scale/normalize the melspectrogram to range required for Google embedding model
+             * See the paper for this model here: https://arxiv.org/abs/2002.01322
+             * Now values will be in range 1.0 to 6.0 dB instead of -10.0 to 40.0 dB 
+             */
+            std::transform(mel_data, mel_data + mel_count, std::back_inserter(_melspectrogram_out),
+                           [](float val)
+                           { return (val / 10.0f) + 2.0f; });
+>>>>>>> main
 
     /* Scale/normalize the melspectrogram to range required for Google embedding
      * model

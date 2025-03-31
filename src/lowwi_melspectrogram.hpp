@@ -37,6 +37,16 @@ public:
   Melspectrogram(Ort::Env &env, Ort::SessionOptions &session_options);
 
   /**
+   * @brief Prevent this class from being used with copy constructor
+   */
+  Melspectrogram(const Melspectrogram &) = delete;
+
+  /**
+   * @brief Prevent this class from being used with assignment constructor
+   */
+  Melspectrogram &operator=(const Melspectrogram &) = delete;
+
+  /**
    * @brief Convert audio samples to melspectrogram samples
    *        using Onnx Melspectrogram model
    * @param audio_samples Reference to vector which stores your audio samples
