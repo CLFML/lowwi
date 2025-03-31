@@ -16,6 +16,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: ros-tooling/setup-ros@v0.7
+        with:
+          required-ros-distributions: jazzy
+
+      - name: Install required packages
+        # To compile and run the code we require cmake, ninja and opencv
+        run: sudo apt-get update && sudo apt-get install build-essential cmake ninja-build ros-jazzy-diagnostic-updater libsdl2-dev
       - name: Download and install audio_tools package
         run: |
             curl -s https://api.github.com/repos/CLFML/ROS2_Audio_Tools/releases/latest \
@@ -25,14 +32,6 @@ jobs:
             | wget -qi -
             
             sudo dpkg -i *.deb
-      - uses: ros-tooling/setup-ros@v0.7
-        with:
-          required-ros-distributions: jazzy
-
-      - name: Install required packages
-        # To compile and run the code we require cmake, ninja and opencv
-        run: sudo apt-get update && sudo apt-get install build-essential cmake ninja-build ros-jazzy-diagnostic-updater libsdl2-dev
-
       - name: Install dependencies
         working-directory: ${{ github.workspace }}
         run: |
