@@ -4,7 +4,7 @@ project(lowwi VERSION 3.11.5 LANGUAGES C CXX)
 
 # === Options ===
 option(CLFML_LOWWI_BUILD_EXAMPLE_PROJECTS "Build example projects" ON)
-option(CLFML_LOWWI_ROS2_PACKAGE_BUILD "Build a ROS2 package (requires ROS2 jazzy)" ON)
+option(CLFML_LOWWI_ROS2_PACKAGE_BUILD "Build a ROS2 package (requires ROS2 jazzy)" OFF)
 option(CLFML_LOWWI_CONDA_PACKAGING "Build as conda package" OFF)
 
 # === C++ standard and policies ===
