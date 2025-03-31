@@ -1,0 +1,46 @@
+name: Security Scan
+
+on:
+  pull_request:
+    branches:
+      - main  # or your default branch
+
+jobs:
+  security_scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # CodeQL Security Analysis
+      - name: Set up CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: 'cpp,python'  # adjust to your project's languages
+
+      - name: Run CodeQL analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          check-clean: false  # Optional, it doesn't break on clean code
+
+      # Snyk for scanning dependencies
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+
+      - name: Run Snyk test
+        run: snyk test
+
+      # TruffleHog for detecting secrets
+      - name: Install TruffleHog
+        run: pip install truffleHog
+
+      - name: Scan for secrets
+        run: trufflehog --json https://github.com/${{ github.repository }}.git > trufflehog_results.json || true
+
+      # Publish results from all security scans
+      - name: Upload security scan results
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-scan-results
+          path: trufflehog_results.json

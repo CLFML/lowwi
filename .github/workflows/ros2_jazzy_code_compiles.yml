@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - uses: ros-tooling/setup-ros@v0.7
         with:
           required-ros-distributions: jazzy
@@ -23,17 +23,6 @@ jobs:
       - name: Install required packages
         # To compile and run the code we require cmake, ninja and opencv
         run: sudo apt-get update && sudo apt-get install build-essential cmake ninja-build ros-jazzy-diagnostic-updater libsdl2-dev
-
-      - name: Download ROS2 audio tools
-        run: |
-              curl -s https://api.github.com/repos/CLFML/ROS2_Audio_Tools/releases/latest \
-              | grep "browser_download_url.*deb" \
-              | cut -d : -f 2,3 \
-              | tr -d \" \
-              | wget -qi -
-      
-      - name: Install ROS2 audio tools
-        run: sudo dpkg -i *.deb
 
       - name: Install dependencies
         working-directory: ${{ github.workspace }}
@@ -45,4 +34,4 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           source /opt/ros/jazzy/setup.bash
-          colcon build --packages-select lowwi
+          colcon build

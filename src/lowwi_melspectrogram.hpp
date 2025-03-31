@@ -60,7 +60,7 @@ namespace CLFML::LOWWI
         std::vector<float> _samples_to_process;
         std::vector<float> _melspectrogram_out;
 
-        const std::filesystem::path _melspectrogram_model_path = "models/melspectrogram.onnx";
+        std::filesystem::path _melspectrogram_model_path = "models/melspectrogram.onnx";
 
     };
 

@@ -48,3 +48,6 @@ log/
 
 # Pixi lock file
 pixi.lock
+
+# Conda build artifacts
+output/

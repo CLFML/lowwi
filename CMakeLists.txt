@@ -6,7 +6,9 @@ project(lowwi VERSION 3.11.5 LANGUAGES C CXX)
 option(CLFML_LOWWI_BUILD_EXAMPLE_PROJECTS "Build example projects" ON)
 
 # Optionally enable ROS2 package build (Requires ROS2 jazzy to be installed!)
-option(CLFML_LOWWI_ROS2_PACKAGE_BUILD "Build a ROS2 package" OFF)
+option(CLFML_LOWWI_ROS2_PACKAGE_BUILD "Build a ROS2 package" ON)
+
+option(CLFML_LOWWI_CONDA_PACKAGING "Build as conda package" OFF)
 
 # Internal flag used to determine whether or not to build examples automatically
 set(CLFML_LOWWI_MAIN_PROJECT OFF)
@@ -51,7 +53,7 @@ else()
         # Get onnx release for windows x64 from Github page
         FetchContent_Declare(
         onnxruntime
-        URL https://github.com/microsoft/onnxruntime/releases/download/v1.20.1/onnxruntime-win-x64-1.20.1.zip
+        URL https://github.com/microsoft/onnxruntime/releases/download/v1.18.1/onnxruntime-win-x64-1.18.1.zip
         SOURCE_DIR ${ONNXRUNTIME_ROOTDIR}
         )
         FetchContent_MakeAvailable(onnxruntime)
@@ -77,16 +79,14 @@ else()
         # Get Linux x64 onnx release from GitHub
         FetchContent_Declare(
             onnxruntime
-            URL https://github.com/microsoft/onnxruntime/releases/download/v1.20.0/onnxruntime-linux-x64-1.20.0.tgz
+            URL https://github.com/microsoft/onnxruntime/releases/download/v1.18.1/onnxruntime-linux-x64-1.18.1.tgz
             SOURCE_DIR ${ONNXRUNTIME_ROOTDIR}
         )
         FetchContent_MakeAvailable(onnxruntime)
         # Add ONNX library include files to include path
         target_include_directories(lowwi_lib PUBLIC ${ONNXRUNTIME_ROOTDIR}/include)
         # Link the directories to project
-        link_directories(lowwi_lib ${ONNXRUNTIME_ROOTDIR}/lib)
-        # Link the onnxruntime library to project
-        target_link_libraries(lowwi_lib onnxruntime)
+        target_link_libraries(lowwi_lib ${ONNXRUNTIME_ROOTDIR}/lib/libonnxruntime.so)
     endif()
 
 endif()
@@ -100,13 +100,21 @@ add_custom_target(copy_models ALL
 )
 
 if (CLFML_LOWWI_ROS2_PACKAGE_BUILD)
+if(CLFML_LOWWI_CONDA_PACKAGING)
+    message(STATUS "CMake is running with install. Installation directory: ${CMAKE_INSTALL_PREFIX}")
+    add_compile_definitions(-DCLFML_LOWWI_CONDA_PACKAGING)
+else()
+    message(STATUS "CMake is not running with install.")
+endif()
   find_package(ament_cmake REQUIRED)
   find_package(rclcpp REQUIRED)
   find_package(builtin_interfaces REQUIRED)
   find_package(rosidl_default_generators REQUIRED)
   find_package(std_msgs REQUIRED)
   find_package(std_srvs REQUIRED)
+  find_package(SDL2)
   find_package(audio_tools)
+  target_link_libraries(lowwi_lib ${cv_bridge_LIBRARIES})
   add_executable(lowwi_node ${CMAKE_CURRENT_LIST_DIR}/bindings/ros2/lowwi_node.cpp)
   rosidl_generate_interfaces(${PROJECT_NAME}
   bindings/ros2/msg/WakeWord.msg
@@ -128,13 +136,19 @@ if (CLFML_LOWWI_ROS2_PACKAGE_BUILD)
   target_include_directories(lowwi_node PUBLIC ${audio_tools_INCLUDE_DIRS})
   # Get list of all so files in the onnxruntime lib directory
    file(GLOB onnx_so_files ${ONNXRUNTIME_ROOTDIR}/lib/*.so*)
-    install(FILES ${onnx_so_files} DESTINATION lib)
+    install(FILES ${onnx_so_files} DESTINATION lib/)
       # Set the example fragments path
       set(LOWWI_EXAMPLE_FRAGMENTS_PATH ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_fragment/example_fragments)
       target_compile_definitions(lowwi_lib PUBLIC -DCLFML_LOWWI_EXAMPLE_FRAGMENTS="${LOWWI_EXAMPLE_FRAGMENTS_PATH}")
   install(TARGETS
+  lowwi_lib
+  DESTINATION lib/)
+  install(TARGETS
     lowwi_node
     DESTINATION lib/${PROJECT_NAME})
+    # Models have to be copied to executable directory
+set(MODELS_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/models)
+install(DIRECTORY ${MODELS_SOURCE_DIR} DESTINATION lib/${PROJECT_NAME})
 endif()
 
 

@@ -27,7 +27,25 @@ namespace CLFML::LOWWI
                                                                                 _session_options(session_options),
                                                                                 _mem_info(Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeCPU))
     {
+        #ifdef CLFML_LOWWI_CONDA_PACKAGING
+        // Get the CONDA_PREFIX environment variable
+        const char* condapath = std::getenv("CONDA_PREFIX");
+        if (condapath) {
+            // Prepend CONDA_PREFIX to the model path if the environment variable is set
+            std::filesystem::path model_path = std::filesystem::path(condapath) / "lib" / "lowwi" / _embedding_model_path;
+            
+            // Now use model_path to create a session
+            _session = std::make_unique<Ort::Session>(_env, model_path.c_str(), _session_options);
+        } else {
+            // Handle the case when the CONDA_PREFIX environment variable is not set
+            printf("CONDA_PREFIX environment variable is not set!\n");
+            // Handle error or default model path logic
+            _session = std::make_unique<Ort::Session>(_env, _embedding_model_path.c_str(), _session_options);
+        }
+    #else
+        // Default logic when CLFML_LOWWI_CONDA_PACKAGING is not defined
         _session = std::make_unique<Ort::Session>(_env, _embedding_model_path.c_str(), _session_options);
+    #endif
     }
 
     std::vector<float> &Embedding::convert(const std::vector<float> &mels_in)

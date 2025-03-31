@@ -20,8 +20,7 @@ ros-jazzy-desktop = "*"
 colcon-common-extensions = "*"
 ros-jazzy-audio-tools = "*"
 rosdep = "*"
-conda-build = ">=25.1.2,<26"
-conda-verify = ">=3.4.2,<4"
+rattler-build = "*"
 
 
 [target.linux-64.dependencies]
