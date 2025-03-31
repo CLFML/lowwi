@@ -6,7 +6,7 @@ project(lowwi VERSION 3.11.5 LANGUAGES C CXX)
 option(CLFML_LOWWI_BUILD_EXAMPLE_PROJECTS "Build example projects" ON)
 
 # Optionally enable ROS2 package build (Requires ROS2 jazzy to be installed!)
-option(CLFML_LOWWI_ROS2_PACKAGE_BUILD "Build a ROS2 package" ON)
+option(CLFML_LOWWI_ROS2_PACKAGE_BUILD "Build a ROS2 package" OFF)
 
 option(CLFML_LOWWI_CONDA_PACKAGING "Build as conda package" OFF)
 
