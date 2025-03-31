@@ -13,14 +13,14 @@ option(CLFML_LOWWI_CONDA_PACKAGING "Build as conda package" OFF)
 # Internal flag used to determine whether or not to build examples automatically
 set(CLFML_LOWWI_MAIN_PROJECT OFF)
 
-if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     set(CMAKE_CXX_STANDARD 17)
     set(CLFML_LOWWI_MAIN_PROJECT ON)
 else()
     set(CLFML_LOWWI_BUILD_EXAMPLE_PROJECTS OFF)
 endif()
 
-if (POLICY CMP0077)
+if(POLICY CMP0077)
     # Allow CMake 3.13+ to override options when using FetchContent / add_subdirectory.
     cmake_policy(SET CMP0077 NEW)
 endif()
@@ -31,14 +31,14 @@ endif()
 
 # Create the Lowi Library
 add_library(lowwi_lib ${CMAKE_CURRENT_LIST_DIR}/src/lowwi.cpp
-                            ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_melspectrogram.cpp
-                            ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_embedding.cpp
-                            ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_wakeword.cpp)
+    ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_melspectrogram.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_embedding.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_wakeword.cpp)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    target_compile_options(${PROJECT_NAME} PRIVATE /wd4625  # Suppresses warning C4625
-                                                   /wd4626  # Suppresses warning C4626
-                                                   )
+    target_compile_options(lowwi_lib PRIVATE /wd4625 # Suppresses warning C4625
+        /wd4626 # Suppresses warning C4626
+    )
 endif()
 
 # Create alias CLFML::Lowi
@@ -48,20 +48,20 @@ target_include_directories(lowwi_lib PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src)
 
 
 # Check if onnxruntime target exists?
-if (TARGET onnxruntime)
-    target_link_libraries(${PROJECT_NAME} onnxruntime)
+if(TARGET onnxruntime)
+    target_link_libraries(lowwi_lib onnxruntime)
 else()
-   # Fetch onnx manually
+    # Fetch onnx manually
     include(FetchContent)
- 
+
     set(ONNXRUNTIME_ROOTDIR ${CMAKE_CURRENT_LIST_DIR}/lib/x64)
     # Check if we are compiling with MSVC for Windows
     if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
         # Get onnx release for windows x64 from Github page
         FetchContent_Declare(
-        onnxruntime
-        URL https://github.com/microsoft/onnxruntime/releases/download/v1.18.1/onnxruntime-win-x64-1.18.1.zip
-        SOURCE_DIR ${ONNXRUNTIME_ROOTDIR}
+            onnxruntime
+            URL https://github.com/microsoft/onnxruntime/releases/download/v1.18.1/onnxruntime-win-x64-1.18.1.zip
+            SOURCE_DIR ${ONNXRUNTIME_ROOTDIR}
         )
         FetchContent_MakeAvailable(onnxruntime)
 
@@ -75,23 +75,23 @@ else()
         target_link_libraries(lowwi_lib onnxruntime onnxruntime_providers_shared)
 
         # Turn off some compile warnings which are windows specific (but not fixable, due to it being an ONNX problem)
-        target_compile_options(${PROJECT_NAME} PRIVATE  /wd4820  # Suppresses warning C4820
-                                                        /wd4514  # Suppresses warning C4514
-                                                        /wd4710  # Suppresses warning C4710
-                                                        /wd4625  # Suppresses warning C4625
-                                                        /wd4626  # Suppresses warning C4626
-                                                        /wd5045  # Suppresses warning C5045 (spectre)
-                                                        /wd4365  # Supresses  warning C4365
-                                                       )
+        target_compile_options(lowwi_lib PRIVATE /wd4820 # Suppresses warning C4820
+            /wd4514 # Suppresses warning C4514
+            /wd4710 # Suppresses warning C4710
+            /wd4625 # Suppresses warning C4625
+            /wd4626 # Suppresses warning C4626
+            /wd5045 # Suppresses warning C5045 (spectre)
+            /wd4365 # Supresses  warning C4365
+        )
 
         # Get list of all dll files in the onnxruntime lib directory
         file(GLOB onnx_dll_files ${ONNXRUNTIME_ROOTDIR}/lib/*.dll)
 
         # Copy the DLL files to the executable dir.
         add_custom_target(copy_onnxruntime_dll ALL
-                          COMMAND ${CMAKE_COMMAND} -E copy ${onnx_dll_files} $<TARGET_FILE_DIR:lowwi_lib>
-                          COMMENT "Copying ONNX dll files to build folder"
-                            )
+            COMMAND ${CMAKE_COMMAND} -E copy ${onnx_dll_files} $<TARGET_FILE_DIR:lowwi_lib>
+            COMMENT "Copying ONNX dll files to build folder"
+        )
     else()
         # Get Linux x64 onnx release from GitHub
         FetchContent_Declare(
@@ -116,56 +116,56 @@ add_custom_target(copy_models ALL
     COMMENT "Copying models directory to build folder"
 )
 
-if (CLFML_LOWWI_ROS2_PACKAGE_BUILD)
-if(CLFML_LOWWI_CONDA_PACKAGING)
-    message(STATUS "CMake is running with install. Installation directory: ${CMAKE_INSTALL_PREFIX}")
-    add_compile_definitions(-DCLFML_LOWWI_CONDA_PACKAGING)
-else()
-    message(STATUS "CMake is not running with install.")
-endif()
-  find_package(ament_cmake REQUIRED)
-  find_package(rclcpp REQUIRED)
-  find_package(builtin_interfaces REQUIRED)
-  find_package(rosidl_default_generators REQUIRED)
-  find_package(std_msgs REQUIRED)
-  find_package(std_srvs REQUIRED)
-  find_package(SDL2)
-  find_package(audio_tools)
-  target_link_libraries(lowwi_lib ${cv_bridge_LIBRARIES})
-  add_executable(lowwi_node ${CMAKE_CURRENT_LIST_DIR}/bindings/ros2/lowwi_node.cpp)
-  rosidl_generate_interfaces(${PROJECT_NAME}
-  bindings/ros2/msg/WakeWord.msg
-  DEPENDENCIES std_msgs
+if(CLFML_LOWWI_ROS2_PACKAGE_BUILD)
+    if(CLFML_LOWWI_CONDA_PACKAGING)
+        message(STATUS "CMake is running with install. Installation directory: ${CMAKE_INSTALL_PREFIX}")
+        add_compile_definitions(-DCLFML_LOWWI_CONDA_PACKAGING)
+    else()
+        message(STATUS "CMake is not running with install.")
+    endif()
+    find_package(ament_cmake REQUIRED)
+    find_package(rclcpp REQUIRED)
+    find_package(builtin_interfaces REQUIRED)
+    find_package(rosidl_default_generators REQUIRED)
+    find_package(std_msgs REQUIRED)
+    find_package(std_srvs REQUIRED)
+    find_package(SDL2)
+    find_package(audio_tools)
+    target_link_libraries(lowwi_lib ${cv_bridge_LIBRARIES})
+    add_executable(lowwi_node ${CMAKE_CURRENT_LIST_DIR}/bindings/ros2/lowwi_node.cpp)
+    rosidl_generate_interfaces(${PROJECT_NAME}
+        bindings/ros2/msg/WakeWord.msg
+        DEPENDENCIES std_msgs
 
-  )
+    )
 
-  ament_export_dependencies(rosidl_default_runtime)
-  ament_target_dependencies(lowwi_node
-    rclcpp
-    std_msgs
-    std_srvs
-    audio_tools
-  )
-  rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} "rosidl_typesupport_cpp")
-  target_link_libraries(lowwi_node "${cpp_typesupport_target}") 
-  
-  target_link_libraries(lowwi_node lowwi_lib ${audio_tools_LIBRARIES})
-  target_include_directories(lowwi_node PUBLIC ${audio_tools_INCLUDE_DIRS})
-  # Get list of all so files in the onnxruntime lib directory
-   file(GLOB onnx_so_files ${ONNXRUNTIME_ROOTDIR}/lib/*.so*)
+    ament_export_dependencies(rosidl_default_runtime)
+    ament_target_dependencies(lowwi_node
+        rclcpp
+        std_msgs
+        std_srvs
+        audio_tools
+    )
+    rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} "rosidl_typesupport_cpp")
+    target_link_libraries(lowwi_node "${cpp_typesupport_target}")
+
+    target_link_libraries(lowwi_node lowwi_lib ${audio_tools_LIBRARIES})
+    target_include_directories(lowwi_node PUBLIC ${audio_tools_INCLUDE_DIRS})
+    # Get list of all so files in the onnxruntime lib directory
+    file(GLOB onnx_so_files ${ONNXRUNTIME_ROOTDIR}/lib/*.so*)
     install(FILES ${onnx_so_files} DESTINATION lib/)
-      # Set the example fragments path
-      set(LOWWI_EXAMPLE_FRAGMENTS_PATH ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_fragment/example_fragments)
-      target_compile_definitions(lowwi_lib PUBLIC -DCLFML_LOWWI_EXAMPLE_FRAGMENTS="${LOWWI_EXAMPLE_FRAGMENTS_PATH}")
-  install(TARGETS
-  lowwi_lib
-  DESTINATION lib/)
-  install(TARGETS
-    lowwi_node
-    DESTINATION lib/${PROJECT_NAME})
+    # Set the example fragments path
+    set(LOWWI_EXAMPLE_FRAGMENTS_PATH ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_fragment/example_fragments)
+    target_compile_definitions(lowwi_lib PUBLIC -DCLFML_LOWWI_EXAMPLE_FRAGMENTS="${LOWWI_EXAMPLE_FRAGMENTS_PATH}")
+    install(TARGETS
+        lowwi_lib
+        DESTINATION lib/)
+    install(TARGETS
+        lowwi_node
+        DESTINATION lib/${PROJECT_NAME})
     # Models have to be copied to executable directory
-set(MODELS_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/models)
-install(DIRECTORY ${MODELS_SOURCE_DIR} DESTINATION lib/${PROJECT_NAME})
+    set(MODELS_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/models)
+    install(DIRECTORY ${MODELS_SOURCE_DIR} DESTINATION lib/${PROJECT_NAME})
 endif()
 
 
@@ -196,27 +196,27 @@ if(CLFML_LOWWI_BUILD_EXAMPLE_PROJECTS)
 
         # Copy all dll_files of SDL2 to executable dir
         add_custom_target(copy_sdl2_dll ALL
-                          COMMAND ${CMAKE_COMMAND} -E copy ${sdl2_dll_files} $<TARGET_FILE_DIR:lowwi_lib>
-                          COMMENT "Copying dll file to build folder"
-                          )
+            COMMAND ${CMAKE_COMMAND} -E copy ${sdl2_dll_files} $<TARGET_FILE_DIR:lowwi_lib>
+            COMMENT "Copying dll file to build folder"
+        )
     else()
         # On linux & mac, we want to use system/brew provided packages
         find_package(SDL2 REQUIRED)
     endif()
-  else ()
+else()
     # Example fragments for demo_fragments should be copied to executable dir too
     add_custom_target(copy_example_fragments ALL
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_fragment/example_fragments $<TARGET_FILE_DIR:lowwi_lib>
         COMMENT "Copying example fragments to build folder"
     )
-    
+
     # Add the demo_fragments demo
     add_executable(LOWWI_demo ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_fragment/demo.cpp)
-    
+
     # Add the mic demo
     add_executable(LOWWI_demo_mic ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_mic/demo_mic.cpp
-                                  ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_mic/audio_async/audio_async.cpp)
-    
+        ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_mic/audio_async/audio_async.cpp)
+
     # Set the example fragments path
     set(LOWWI_EXAMPLE_FRAGMENTS_PATH $<TARGET_FILE_DIR:${PROJECT_NAME}>)
     target_compile_definitions(LOWWI_demo PUBLIC -DCLFML_LOWWI_EXAMPLE_FRAGMENTS="${LOWWI_EXAMPLE_FRAGMENTS_PATH}")
@@ -227,7 +227,7 @@ if(CLFML_LOWWI_BUILD_EXAMPLE_PROJECTS)
     target_link_libraries(LOWWI_demo_mic PUBLIC lowwi_lib ${SDL2_LIBRARIES})
 endif()
 
-if (CLFML_LOWWI_ROS2_PACKAGE_BUILD)
-  install(FILES bindings/ros2/set_ld_path.sh DESTINATION lib/${PROJECT_NAME})
-  ament_package()
+if(CLFML_LOWWI_ROS2_PACKAGE_BUILD)
+    install(FILES bindings/ros2/set_ld_path.sh DESTINATION lib/${PROJECT_NAME})
+    ament_package()
 endif()
