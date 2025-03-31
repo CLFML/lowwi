@@ -58,13 +58,11 @@ std::vector<float> &Embedding::convert(const std::vector<float> &mels_in) {
 
   /*
    * At a 16 kHz sampling rate,
-   * the total duration of 76 frames (with appropriate hop size) should match
-   * 775 ms.
+   * the total duration of 76 frames (with appropriate hop size) should match 775 ms.
    */
   const size_t _embedding_window_size = 76;
   const size_t _embedding_mels_per_frame = 32; // fixed by model
   const size_t _embedding_step_size = 8;       // 80 ms
-  const size_t _embedding_frame_size = 1280 * 4;
 
   /* Calculate the amount of mel_frames to process */
   size_t mel_frames = _samples_to_process.size() / _embedding_mels_per_frame;
@@ -86,21 +84,18 @@ std::vector<float> &Embedding::convert(const std::vector<float> &mels_in) {
     /* Get the output tensor */
     const auto &emb_out = output_tensors.front();
     const auto emb_shape = emb_out.GetTensorTypeAndShapeInfo().GetShape();
-            /* Small gotcha! Reserving before copy saves so much time! */
-            int64_t emb_out_count = emb_shape.at(3);
-
-            /* Return early if we got a negative number, which would cause severe memory issues! */
-            if(emb_out_count < 0) {
-                return _embedding_out;
-            }
-
-            _embedding_out.reserve(_embedding_out.size() + emb_out_count);
 
     /* Get one dimensional representation of the embedding data */
     const float *emb_out_data = emb_out.GetTensorData<float>();
 
     /* Small gotcha! Reserving before copy saves so much time! */
-    size_t emb_out_count = emb_shape.at(3);
+    int64_t emb_out_count = emb_shape.at(3);
+
+    /* Return early if we got a negative number, which would cause severe memory issues! */
+    if (emb_out_count < 0) {
+      return _embedding_out;
+    }
+
     _embedding_out.reserve(_embedding_out.size() + emb_out_count);
 
     /* Copy the embedding data from output tensor to internal buffer */

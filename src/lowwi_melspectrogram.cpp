@@ -53,12 +53,11 @@ std::vector<float> &Melspectrogram::convert(const std::vector<float> &audio_samp
 
   /*
    * This could have been done without copying.
-   * But copying was a bit safer compared to making the parameter non-const and
-   * changing the passed in array directly. The performance implications are not
-   * that big, mostly arrays between 5000-10000 floats. Which would
-   * theoretically take around 0.008 msec (without cache misses) on modern intel
-   * CPU with DDR4. This is almost negligible. But might be interesting to
-   * profile in the near future, when doing further optimizations.
+   * But copying was a bit safer compared to making the parameter non-const and changing the passed in array directly.
+   * The performance implications are not that big, mostly arrays between 5000-10000 floats.
+   * Which would theoretically take around 0.008 msec (without cache misses) on modern intel CPU with DDR4.
+   * This is almost negligible.
+   * But might be interesting to profile in the near future, when doing further optimizations.
    */
   _samples_to_process.insert(_samples_to_process.end(), audio_samples.begin(), audio_samples.end());
 
@@ -73,9 +72,8 @@ std::vector<float> &Melspectrogram::convert(const std::vector<float> &audio_samp
   /*
    * The model is flexible and will take n-amount of samples.
    * However do to the feature model performing better on chunks,
-   * The buffer has to be chunked to small segments of 1000-3000 samples at a
-   * time The default setting of 1280 samples (*4 for windowing?) seems to work
-   * quite well
+   * The buffer has to be chunked to small segments of 1000-3000 samples at a time
+   * The default setting of 1280 samples (*4 for windowing?) seems to work quite well
    */
   while (start_idx + _melspectrogram_frame_size <= _samples_to_process.size()) {
     /* Load in the samples in to our model inputs */
@@ -93,27 +91,16 @@ std::vector<float> &Melspectrogram::convert(const std::vector<float> &audio_samp
     /* Get one dimensional representation of the melspectrogram data */
     const auto *mel_data = mel_out.GetTensorData<float>();
 
-    /* Data is multidimensional, to get the complete number of points we need to
-     * do cross-product */
+    /* Data is multidimensional, to get the complete number of points we need to do cross-product */
     size_t mel_count = (mel_shape.at(2) * mel_shape.at(3));
 
-<<<<<<< HEAD
     /* Reserve space beforehand, doing it dynamically in loop is stupid */
     _melspectrogram_out.reserve(_melspectrogram_out.size() + mel_count);
-=======
-            /* Scale/normalize the melspectrogram to range required for Google embedding model
-             * See the paper for this model here: https://arxiv.org/abs/2002.01322
-             * Now values will be in range 1.0 to 6.0 dB instead of -10.0 to 40.0 dB 
-             */
-            std::transform(mel_data, mel_data + mel_count, std::back_inserter(_melspectrogram_out),
-                           [](float val)
-                           { return (val / 10.0f) + 2.0f; });
->>>>>>> main
 
-    /* Scale/normalize the melspectrogram to range required for Google embedding
-     * model
+    /* Scale/normalize the melspectrogram to range required for Google embedding model
      * See the paper for this model here: https://arxiv.org/abs/2002.01322
-    /* Now values will be in range 1.0 to 6.0 dB instead of -10.0 to 40.0 dB */
+     * Now values will be in range 1.0 to 6.0 dB instead of -10.0 to 40.0 dB
+     */
     std::transform(mel_data, mel_data + mel_count, std::back_inserter(_melspectrogram_out),
                    [](float val) { return (val / 10.0f) + 2.0f; });
 

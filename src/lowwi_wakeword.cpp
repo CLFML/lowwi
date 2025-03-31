@@ -24,56 +24,23 @@
 
 namespace CLFML::LOWWI {
 
-<<<<<<< HEAD
 WakeWord::WakeWord(Ort::Env &env, Ort::SessionOptions &session_options, const std::filesystem::path model_path,
-                   const float threshold, const float min_activations, const int refractory, const uint8_t debug)
+                   const float threshold, const uint32_t min_activations, const int refractory, const uint8_t debug)
     : _env(env), _session_options(session_options),
+      _session(nullptr), // Initialize session as nullptr (it will be assigned later)
       _mem_info(Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeCPU)),
-      _threshold(threshold), _model_path(model_path), _debug(debug), _min_activations(min_activations),
-      _refractory(refractory) {
-  /*
-   * Create new session for our Onnx model
-   * Also load the model in :)
-   */
+      _allocator(), _samples_to_process(), _debug(debug), _model_path(model_path), _threshold(threshold),
+      _min_activations(min_activations), _refractory(refractory) {
+  // Now initialize _session properly
   _session = std::make_unique<Ort::Session>(_env, _model_path.c_str(), _session_options);
 }
-=======
-    WakeWord::WakeWord(Ort::Env &env, Ort::SessionOptions &session_options,
-                       const std::filesystem::path model_path, const float threshold,
-                       const uint32_t min_activations, const int refractory, const uint8_t debug)
-        : _env(env),
-          _session_options(session_options),
-          _session(nullptr), // Initialize session as nullptr (it will be assigned later)
-          _mem_info(Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeCPU)),
-          _allocator(),
-          _samples_to_process(),
-          _debug(debug),
-          _model_path(model_path),
-          _threshold(threshold),
-          _min_activations(min_activations),
-          _refractory(refractory)
-    {
-        // Now initialize _session properly
-        _session = std::make_unique<Ort::Session>(_env, _model_path.c_str(), _session_options);
-    }
->>>>>>> main
 
 wakeword_result WakeWord::detect(const std::vector<float> &features) {
   wakeword_result res{0, 0};
 
-<<<<<<< HEAD
   if (features.size() == 0) {
     return res;
   }
-=======
-        if (features.size() == 0)
-        {
-            return res;
-        }
-
-        /* Reserve the space for the samples */
-        _samples_to_process.reserve(features.size() + _samples_to_process.size());
->>>>>>> main
 
   /* Reserve the space for the samples */
   _samples_to_process.reserve(features.size() + _samples_to_process.size());
@@ -81,18 +48,11 @@ wakeword_result WakeWord::detect(const std::vector<float> &features) {
   /* Copy the melspectrogram samples to internal buffer */
   _samples_to_process.insert(_samples_to_process.end(), features.begin(), features.end());
 
-<<<<<<< HEAD
   /* Copy features to internal buffer for further processing */
   std::copy(features.begin(), features.end(), std::back_inserter(_samples_to_process));
-=======
-        /* Used for scoring the wakeword probability/confidence */
-        uint32_t activation = 0;
-        int num_of_triggers = 0;
-        int sum_probability = 0;
->>>>>>> main
 
   /* Used for scoring the wakeword probability/confidence */
-  int activation = 0;
+  uint32_t activation = 0;
   int num_of_triggers = 0;
   int sum_probability = 0;
 
@@ -104,10 +64,8 @@ wakeword_result WakeWord::detect(const std::vector<float> &features) {
   size_t num_features = _samples_to_process.size() / _wakeword_samples_per_feature;
   while (num_features >= _wakeword_feature_window) {
     /* Model constants */
-    auto model_input_name = _session->GetInputNameAllocated(0, _allocator);
-    auto model_output_name = _session->GetOutputNameAllocated(0, _allocator);
-    const std::array<const char *, 1> _input_names = {model_input_name.get()};
-    const std::array<const char *, 1> _output_names{model_output_name.get()};
+    const std::array<const char *, 1> _input_names{"onnx::Flatten_0"};
+    const std::array<const char *, 1> _output_names{"39"};
     const std::array<int64_t, 3> _input_shape{1, (int64_t)16, 96};
 
     /* Create input tensor from data & input shape */
@@ -129,7 +87,6 @@ wakeword_result WakeWord::detect(const std::vector<float> &features) {
     if (ww_out_data != NULL) {
       auto probability = ww_out_data[0];
 
-<<<<<<< HEAD
       if (probability > _threshold) {
         if (_debug) {
           std::cerr << _model_path << " " << probability << '\n';
@@ -141,38 +98,6 @@ wakeword_result WakeWord::detect(const std::vector<float> &features) {
           activation = -_refractory; // Reset activation with refractory period
           sum_probability += int(float(probability * 100));
           num_of_triggers++;
-=======
-                    // Increment activation and check trigger
-                    if (++activation >= _min_activations)
-                    {
-                        res.detected = 1;          // Trigger level reached
-                        activation = -_refractory; // Reset activation with refractory period
-                        sum_probability += int(float(probability * 100));
-                        num_of_triggers++;
-                    }
-                }
-                else
-                {
-                    // Adjust activation towards 0
-                    activation += (activation > 0) ? -1 : 1;
-                }
-            }
-
-            /* Move buffer a step worth of samples */
-            sample_idx += _wakeword_samples_per_feature;
-
-            /* Calculate new num_features */
-            num_features = (_samples_to_process.size() - sample_idx) / _wakeword_samples_per_feature;
-        }
-
-        /* Calculate the avg probability or zero if no wakeword triggers */
-        res.confidence = (num_of_triggers > 0) ? float(sum_probability / num_of_triggers) : 0.0f;
-
-        if (sample_idx > 0)
-        {
-            /* erase all processed features */
-            _samples_to_process.erase(_samples_to_process.begin(), _samples_to_process.begin() + sample_idx);
->>>>>>> main
         }
       } else {
         // Adjust activation towards 0

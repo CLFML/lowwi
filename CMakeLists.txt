@@ -34,7 +34,6 @@ add_library(lowwi_lib ${CMAKE_CURRENT_LIST_DIR}/src/lowwi.cpp
                             ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_melspectrogram.cpp
                             ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_embedding.cpp
                             ${CMAKE_CURRENT_LIST_DIR}/src/lowwi_wakeword.cpp)
-target_compile_options(${PROJECT_NAME} PRIVATE "-Wall")
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     target_compile_options(${PROJECT_NAME} PRIVATE /wd4625  # Suppresses warning C4625

@@ -30,13 +30,6 @@ namespace CLFML::LOWWI {
 class Melspectrogram {
 public:
   /**
-   * @param env Reference to Onnx environment which the model will run in
-   * @param session_options Reference to Onnx options which configure the
-   * session for this model
-   */
-  Melspectrogram(Ort::Env &env, Ort::SessionOptions &session_options);
-
-  /**
    * @brief Prevent this class from being used with copy constructor
    */
   Melspectrogram(const Melspectrogram &) = delete;
@@ -47,11 +40,17 @@ public:
   Melspectrogram &operator=(const Melspectrogram &) = delete;
 
   /**
+   * @param env Reference to Onnx environment which the model will run in
+   * @param session_options Reference to Onnx options which configure the session for this model
+   */
+  Melspectrogram(Ort::Env &env, Ort::SessionOptions &session_options);
+
+  /**
    * @brief Convert audio samples to melspectrogram samples
    *        using Onnx Melspectrogram model
    * @param audio_samples Reference to vector which stores your audio samples
-   * @return Reference to internal buffer which stores the calculated
-   * melspectrogram samples
+   * @return Reference to internal buffer which stores the calculated melspectrogram
+   *         samples
    */
   std::vector<float> &convert(const std::vector<float> &audio_samples);
 
