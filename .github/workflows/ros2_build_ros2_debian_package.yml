@@ -58,6 +58,9 @@ jobs:
         # Generate changelogs
         catkin_generate_changelog --all || true
 
+        rosdep update
+
+
         # Loop through packages
         for PACKAGE in $(colcon list -t | cut -f2); do
           cd "$ROOT_DIR/$PACKAGE" || continue
