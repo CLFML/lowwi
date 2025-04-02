@@ -25,6 +25,8 @@ jobs:
         ros-jazzy-ros-base \
         ros-jazzy-sdl2-vendor \
         fakeroot || exit $?
+    - name: Checkout this repository
+      uses: actions/checkout@v2.3.4
     - name: Download and install audio_tools package
       run: |
         curl -s https://api.github.com/repos/CLFML/ROS2_Audio_Tools/releases/latest \
@@ -40,8 +42,6 @@ jobs:
         echo "yaml file://$(pwd)/audio_tools.rosdep.yaml" | sudo tee /etc/ros/rosdep/sources.list.d/99-audio-tools.list
         sudo rosdep update
 
-    - name: Checkout this repository
-      uses: actions/checkout@v2.3.4
     - name: Build and package ROS 2 packages
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
