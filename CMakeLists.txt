@@ -46,6 +46,11 @@ endif()
 include(FetchContent)
 set(ONNXRUNTIME_ROOTDIR ${CMAKE_CURRENT_LIST_DIR}/lib/x64)
 
+if(CLFML_LOWWI_NATIVE_DEB_PACKAGING AND NOT EXISTS "${ONNXRUNTIME_ROOTDIR}/include")
+    unset(FETCHCONTENT_FULLY_DISCONNECTED CACHE)
+    message(STATUS "ONNX Runtime source directory missing — enabling network fetch")
+endif()
+
 if(TARGET onnxruntime)
     target_link_libraries(lowwi_lib onnxruntime)
 else()
