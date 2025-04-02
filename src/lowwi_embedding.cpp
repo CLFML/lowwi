@@ -40,6 +40,11 @@ Embedding::Embedding(Ort::Env &env, Ort::SessionOptions &session_options)
     // Handle error or default model path logic
     _session = std::make_unique<Ort::Session>(_env, _embedding_model_path.c_str(), _session_options);
   }
+#elif defined(CLFML_LOWWI_NATIVE_DEB_PACKAGING)
+  // Use /usr/lib/lowwi as the install prefix for native .deb packaging
+  std::filesystem::path model_path = std::filesystem::path("/opt/ros/jazzy/lib/lowwi") / _embedding_model_path;
+  _session = std::make_unique<Ort::Session>(_env, model_path.c_str(), _session_options);
+
 #else
   // Default logic when CLFML_LOWWI_CONDA_PACKAGING is not defined
   _session = std::make_unique<Ort::Session>(_env, _embedding_model_path.c_str(), _session_options);

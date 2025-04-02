@@ -40,6 +40,11 @@ Melspectrogram::Melspectrogram(Ort::Env &env, Ort::SessionOptions &session_optio
     // Handle error or default model path logic
     _session = std::make_unique<Ort::Session>(_env, _melspectrogram_model_path.c_str(), _session_options);
   }
+#elif defined(CLFML_LOWWI_NATIVE_DEB_PACKAGING)
+  // Use /usr/lib/lowwi as the install prefix for native .deb packaging
+  std::filesystem::path model_path = std::filesystem::path("/opt/ros/jazzy/lib/lowwi") / _melspectrogram_model_path;
+  _session = std::make_unique<Ort::Session>(_env, model_path.c_str(), _session_options);
+
 #else
   // Default logic when CLFML_LOWWI_CONDA_PACKAGING is not defined
   _session = std::make_unique<Ort::Session>(_env, _melspectrogram_model_path.c_str(), _session_options);

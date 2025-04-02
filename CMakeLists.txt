@@ -6,6 +6,7 @@ project(lowwi VERSION 3.11.5 LANGUAGES C CXX)
 option(CLFML_LOWWI_BUILD_EXAMPLE_PROJECTS "Build example projects" ON)
 option(CLFML_LOWWI_ROS2_PACKAGE_BUILD "Build a ROS2 package (requires ROS2 jazzy)" OFF)
 option(CLFML_LOWWI_CONDA_PACKAGING "Build as conda package" OFF)
+option(CLFML_LOWWI_NATIVE_DEB_PACKAGING "Build native deb package (sets paths to /opt/ros/jazzy/lib)" OFF)
 
 # === C++ standard and policies ===
 set(CMAKE_CXX_STANDARD 17)
@@ -96,6 +97,10 @@ if(CLFML_LOWWI_ROS2_PACKAGE_BUILD)
     if(CLFML_LOWWI_CONDA_PACKAGING)
         message(STATUS "Conda packaging enabled")
         add_compile_definitions(-DCLFML_LOWWI_CONDA_PACKAGING)
+    endif()
+    if(CLFML_LOWWI_NATIVE_DEB_PACKAGING)
+        message(STATUS "Native deb packaging enabled")
+        add_compile_definitions(-DCLFML_LOWWI_NATIVE_DEB_PACKAGING)
     endif()
 
     find_package(ament_cmake REQUIRED)

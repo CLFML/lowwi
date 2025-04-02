@@ -23,6 +23,7 @@ jobs:
               python3-colcon-common-extensions \
               python3-rosdep \
               ros-jazzy-ros-base \
+              ros-jazzy-sdl2-vendor \
               fakeroot || exit $?
       - name: Download and install audio_tools package
         run: |
@@ -64,7 +65,8 @@ jobs:
             # Generate Debian rules
             bloom-generate rosdebian --ros-distro "$ROS2_DISTRO" -i "$RELEASE_VERSION" || exit $?
       
-            # Build .deb with fakeroot
+            # Build .deb with fakeroot and custom CMake args
+            export DEB_CMAKE_EXTRA_FLAGS="-DCLFML_LOWWI_NATIVE_DEB_PACKAGING=ON"
             fakeroot debian/rules binary -j8 || exit $?
       
             # Install .deb locally
