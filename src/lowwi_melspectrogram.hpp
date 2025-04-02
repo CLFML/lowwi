@@ -21,58 +21,55 @@
 
 #ifndef LOWWI_MELSPECTROGRAM_HPP
 #define LOWWI_MELSPECTROGRAM_HPP
-#include <vector>
 #include "onnxruntime_cxx_api.h"
 #include <filesystem>
+#include <vector>
 
-namespace CLFML::LOWWI
-{
+namespace CLFML::LOWWI {
 
-    class Melspectrogram
-    {
-    public:
-        /**
-          * @brief Prevent this class from being used with copy constructor
-          */
-         Melspectrogram(const Melspectrogram&) = delete;
-         
-        /**
-          * @brief Prevent this class from being used with assignment constructor
-          */
-         Melspectrogram& operator=(const Melspectrogram&) = delete;
+class Melspectrogram {
+public:
+  /**
+   * @brief Prevent this class from being used with copy constructor
+   */
+  Melspectrogram(const Melspectrogram &) = delete;
 
-        /**
-         * @param env Reference to Onnx environment which the model will run in
-         * @param session_options Reference to Onnx options which configure the session for this model
-         */
-        Melspectrogram(Ort::Env &env, Ort::SessionOptions &session_options);
+  /**
+   * @brief Prevent this class from being used with assignment constructor
+   */
+  Melspectrogram &operator=(const Melspectrogram &) = delete;
 
-        /**
-         * @brief Convert audio samples to melspectrogram samples
-         *        using Onnx Melspectrogram model
-         * @param audio_samples Reference to vector which stores your audio samples
-         * @return Reference to internal buffer which stores the calculated melspectrogram
-         *         samples
-         */
-        std::vector<float> &convert(const std::vector<float> &audio_samples);
+  /**
+   * @param env Reference to Onnx environment which the model will run in
+   * @param session_options Reference to Onnx options which configure the session for this model
+   */
+  Melspectrogram(Ort::Env &env, Ort::SessionOptions &session_options);
 
-        ~Melspectrogram();
+  /**
+   * @brief Convert audio samples to melspectrogram samples
+   *        using Onnx Melspectrogram model
+   * @param audio_samples Reference to vector which stores your audio samples
+   * @return Reference to internal buffer which stores the calculated melspectrogram
+   *         samples
+   */
+  std::vector<float> &convert(const std::vector<float> &audio_samples);
 
-    private:
-        /* Onnx variables */
-        Ort::Env &_env;
-        Ort::SessionOptions &_session_options;
-        std::unique_ptr<Ort::Session> _session;
-        Ort::MemoryInfo _mem_info;
-        Ort::AllocatorWithDefaultOptions _allocator;
+  ~Melspectrogram();
 
-        std::vector<float> _samples_to_process;
-        std::vector<float> _melspectrogram_out;
+private:
+  /* Onnx variables */
+  Ort::Env &_env;
+  Ort::SessionOptions &_session_options;
+  std::unique_ptr<Ort::Session> _session;
+  Ort::MemoryInfo _mem_info;
+  Ort::AllocatorWithDefaultOptions _allocator;
 
-        const std::filesystem::path _melspectrogram_model_path = "models/melspectrogram.onnx";
+  std::vector<float> _samples_to_process;
+  std::vector<float> _melspectrogram_out;
 
-    };
+  std::filesystem::path _melspectrogram_model_path = "models/melspectrogram.onnx";
+};
 
-}
+} // namespace CLFML::LOWWI
 
 #endif /* LOWWI_MELSPECTROGRAM_HPP */

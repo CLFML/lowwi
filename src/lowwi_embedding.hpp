@@ -21,56 +21,53 @@
 
 #ifndef LOWWI_EMBEDDING_HPP
 #define LOWWI_EMBEDDING_HPP
-#include <vector>
-#include <onnxruntime_cxx_api.h>
 #include <filesystem>
+#include <onnxruntime_cxx_api.h>
+#include <vector>
 
-namespace CLFML::LOWWI
-{
+namespace CLFML::LOWWI {
 
-    class Embedding
-    {
-    public:
-        /**
-          * @brief Prevent this class from being used with copy constructor
-          */
-         Embedding(const Embedding&) = delete;
-         
-        /**
-          * @brief Prevent this class from being used with assignment constructor
-          */
-         Embedding& operator=(const Embedding&) = delete;
+class Embedding {
+public:
+  /**
+   * @brief Prevent this class from being used with copy constructor
+   */
+  Embedding(const Embedding &) = delete;
 
-        /**
-         * @param env Reference to Onnx environment which the model will run in
-         * @param session_options Reference to Onnx options which configure the session for this model
-         */
-        Embedding(Ort::Env &env, Ort::SessionOptions &session_options);
+  /**
+   * @brief Prevent this class from being used with assignment constructor
+   */
+  Embedding &operator=(const Embedding &) = delete;
 
-        /**
-         * @brief Convert melspectrogram samples to feature samples
-         *        using Onnx embedding model
-         * @param mels_in Reference to vector which stores your melspectrogram samples
-         * @return Reference to internal buffer which stores the calculated feature
-         *         samples
-         */
-        std::vector<float> &convert(const std::vector<float> &mels_in);
+  /**
+   * @param env Reference to Onnx environment which the model will run in
+   * @param session_options Reference to Onnx options which configure the session for this model
+   */
+  Embedding(Ort::Env &env, Ort::SessionOptions &session_options);
 
+  /**
+   * @brief Convert melspectrogram samples to feature samples
+   *        using Onnx embedding model
+   * @param mels_in Reference to vector which stores your melspectrogram samples
+   * @return Reference to internal buffer which stores the calculated feature
+   *         samples
+   */
+  std::vector<float> &convert(const std::vector<float> &mels_in);
 
-        ~Embedding();
+  ~Embedding();
 
-    private:
-        /* Onnx variables */
-        Ort::Env &_env;
-        Ort::SessionOptions &_session_options;
-        std::unique_ptr<Ort::Session> _session;
-        Ort::MemoryInfo _mem_info;
-        Ort::AllocatorWithDefaultOptions _allocator;
-        
-        std::vector<float> _samples_to_process;
-        std::vector<float> _embedding_out;
+private:
+  /* Onnx variables */
+  Ort::Env &_env;
+  Ort::SessionOptions &_session_options;
+  std::unique_ptr<Ort::Session> _session;
+  Ort::MemoryInfo _mem_info;
+  Ort::AllocatorWithDefaultOptions _allocator;
 
-        const std::filesystem::path _embedding_model_path = "models/embedding_model.onnx";
-    };
-}
+  std::vector<float> _samples_to_process;
+  std::vector<float> _embedding_out;
+
+  std::filesystem::path _embedding_model_path = "models/embedding_model.onnx";
+};
+} // namespace CLFML::LOWWI
 #endif /* LOWWI_EMBEDDING_HPP */

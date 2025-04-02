@@ -1,0 +1,97 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json
+context:
+  name: ros-jazzy-${{ env.get("package_name", default="custom_pkg") }}
+  version: ${{ env.get("package_ver", default="0.0.0") }}
+
+package:
+  name: ${{ name|lower }}
+  version: ${{ version }}
+
+source:
+  path: ../
+  use_gitignore: true # note: defaults to true
+build:
+  # settings for shared libraries and executables
+  dynamic_linking:
+    # linux only, list of rpaths relative to the installation prefix
+    rpaths: list of paths (defaults to ['lib/'])
+
+    # Allow runpath / rpath to point to these locations
+    # outside of the environment
+    rpath_allowlist: list of globs
+
+    # whether to relocate binaries or not. If this is a list of paths, then
+    # only the listed paths are relocated
+    binary_relocation: false
+
+    # Allow linking against libraries that are not in the run requirements
+    missing_dso_allowlist: list of globs
+
+    # what to do when detecting overdepending
+    overdepending_behavior: "ignore"
+
+    # what to do when detecting overlinking
+    overlinking_behavior: "ignore"
+  number: 0
+  script:
+  - if: win
+    then: 'bld_colcon_merge.bat'
+    else: '$RECIPE_DIR/build_ament_cmake.sh'
+requirements:
+  build:
+  - ninja
+  - python
+  - make
+  - cmake
+  - ros-jazzy-ros-core
+  - colcon-core
+  - colcon-ros
+  - ros-jazzy-audio-tools
+  - if: unix
+    then:
+    - glib
+    - libcxx
+    - ros-jazzy-desktop
+    - gcc
+    - gxx
+    - patch
+    - coreutils
+    - lttng-ust
+  - if: win
+    then:
+    - msbuild
+    - make
+    - setuptools
+    - m2-patch
+    - numpy
+
+  host:
+  - ros-jazzy-ament-cmake
+  - ros-jazzy-audio-tools
+  - ros-jazzy-rosidl-default-generators
+  - ros-jazzy-rclcpp
+  - ros-jazzy-std-msgs
+  - ros-jazzy-rclcpp
+  - ros-jazzy-std-msgs
+  - ros-jazzy-ament-lint-auto
+  - ros-jazzy-ament-lint-common
+  run:
+  - ros-jazzy-audio-tools
+  - ros-jazzy-rclcpp
+  - ros-jazzy-std-msgs
+  - ros-jazzy-rosidl-default-runtime
+  - ros-jazzy-rclcpp
+  - ros-jazzy-std-msgs
+
+about:
+  homepage: ${{ env.get("package_gh", default="https://github.com/CLFML") }}
+  license: Apache-2.0
+  license_file: LICENSE
+  summary: ${{ env.get("package_summary", default="Some library") }}
+  description: ${{ env.get("package_desc", default="doing something") }}
+  documentation: ${{ env.get("package_documentation_link", default="https://github.com/CLFML") }}
+  repository: ${{ env.get("package_gh", default="https://github.com/CLFML") }}
+
+extra:
+  recipe-maintainers:
+  - ${{ env.get("package_maintainer", default="someone") }}

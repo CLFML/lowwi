@@ -1,0 +1,39 @@
+[project]
+authors = ["Hoog-V <hogeweyv@gmail.com>"]
+name = "lowwi-ros2"
+channels = ["https://fast.prefix.dev/conda-forge", "https://prefix.dev/robostack-jazzy", "https://clfml.github.io/conda_ros2_jazzy_channel/"]
+platforms = ["linux-64", "win-64"]
+preview = ["pixi-build"]
+
+[tasks]
+build = "colcon build --packages-select lowwi --cmake-args -DCMAKE_BUILD_TYPE=Release"
+
+[tasks.start]
+cmd = "ros2 run lowwi lowwi_node"
+depends-on=["build"]
+
+[dependencies]
+compilers = ">=1.9.0,<2"
+pkg-config = ">=0.29.2,<0.30"
+ninja = ">=1.12.1,<2"
+ros-jazzy-desktop = "*"
+colcon-common-extensions = "*"
+ros-jazzy-audio-tools = "*"
+rosdep = "*"
+rattler-build = "*"
+
+
+[target.linux-64.dependencies]
+python = "3.11.*"
+python-devtools = "*"         # Optional but useful
+pybind11 = "*"                # Optional, if you work with bindings
+numpy = "*"
+
+[target.win-64.dependencies]
+python-devtools = "*"
+
+[target.win-64.tasks]
+vscode = "code ."
+
+[target.linux-64.tasks]
+vscode = 'env -u LD_LIBRARY_PATH code .'

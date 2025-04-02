@@ -1,0 +1,56 @@
+name: Create ROS2 Jazzy package on Windows
+
+on:
+  workflow_dispatch:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Pixi
+        uses: prefix-dev/setup-pixi@v0.8.3
+
+
+      - name: Build package with Pixi (Windows)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          rattler/set_build_var.ps1
+          pixi run rattler-build build --recipe rattler/recipe.yaml -c conda-forge -c https://prefix.dev/robostack-jazzy -c https://clfml.github.io/conda_ros2_jazzy_channel/ --package-format tar-bz2
+      
+
+      - name: Upload Windows Conda Package to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $repo = (gh repo view --json nameWithOwner | ConvertFrom-Json).nameWithOwner
+          
+          $tag = gh release view --repo $repo --json tagName --jq ".tagName"
+
+          $pkg = Get-ChildItem "output/win-64/ros-jazzy-*.tar.bz2" |
+            Where-Object { $_.Extension -in ".bz2", ".conda" } |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+
+          if (-not $pkg) {
+            Write-Error "❌ No conda package found in win-64."
+          }
+
+          if ($pkg.Name -like "*.tar.bz2") {
+            $renamed = $pkg.FullName -replace '\.tar.bz2$', '-win.tar.bz2'
+            Copy-Item $pkg.FullName $renamed
+          } else {
+            $renamed = $pkg.FullName
+          }
+          
+          gh release upload $tag $renamed --repo $repo --clobber

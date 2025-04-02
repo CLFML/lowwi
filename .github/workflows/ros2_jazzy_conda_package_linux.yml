@@ -1,0 +1,32 @@
+name: Create ROS2 Jazzy package on Linux
+
+on:
+  workflow_dispatch:
+  release:
+    types: [created]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Install Pixi
+        uses: prefix-dev/setup-pixi@v0.8.3
+ 
+      - name: Build package with Pixi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pixi run bash -e {0}
+        run: |
+            source rattler/set_build_var.sh
+            rattler-build build --recipe rattler/recipe.yaml -c conda-forge -c https://prefix.dev/robostack-jazzy -c https://clfml.github.io/conda_ros2_jazzy_channel/ --package-format tar-bz2
+      - name: Upload Release Asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO_FULL=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
+          TAG_NAME=$(gh release view --repo "$REPO_FULL" --json tagName --jq ".tagName")
+
+          gh release upload "$TAG_NAME" output/linux-64/ros-jazzy-*.tar.bz2 --repo "$REPO_FULL"
+
