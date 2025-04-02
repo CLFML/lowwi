@@ -2,92 +2,91 @@ name: Build Debian Packages (ROS2 Jazzy)
 on:
   workflow_dispatch:
   release:
-    types: [created]
+    types: [ created ]
 jobs:
   build-debian-packages:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Install required packages
-        run: sudo apt-get update && sudo apt-get install libsdl2-dev -y
-      - name: Install ROS2 packages
-        run: |
-              sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg || exit $?
-              echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null || exit $?
-              sudo apt update && sudo apt install -y \
-              debhelper \
-              dh-python \
-              python3-bloom \
-              python3-catkin-pkg \
-              python3-colcon-common-extensions \
-              python3-rosdep \
-              ros-jazzy-ros-base \
-              ros-jazzy-sdl2-vendor \
-              fakeroot || exit $?
-      - name: Download and install audio_tools package
-        run: |
-              curl -s https://api.github.com/repos/CLFML/ROS2_Audio_Tools/releases/latest \
-              | grep "browser_download_url.*deb" \
-              | cut -d : -f 2,3 \
-              | tr -d \" \
-              | wget -qi -
-              
-              sudo dpkg -i *.deb
-              echo -e "audio_tools:\n  ubuntu:\n    noble: [ros-jazzy-audio-tools]" | sudo tee /etc/ros/rosdep/audio_tools.yaml
-              echo "yaml file:///etc/ros/rosdep/audio_tools.yaml" | sudo tee /etc/ros/rosdep/sources.list.d/99-audio-tools.list
-              sudo rosdep update
-              
-      - name: Checkout this repository
-        uses: actions/checkout@v2.3.4
-      - name: Build and package ROS 2 packages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -e
-      
-          export ROS2_DISTRO="jazzy"
-          export OUTPUT_DIR="package"
-          export UNIQUE_VERSION="true"
-          export ROOT_DIR=$(pwd)
-          # Get version from latest GitHub release (strip 'v')
-          export RELEASE_VERSION="$(gh release view --json tagName --jq .tagName | sed 's/^v//')"
+    - name: Install required packages
+      run: sudo apt-get update && sudo apt-get install libsdl2-dev -y
+    - name: Install ROS2 packages
+      run: |
+        sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg || exit $?
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null || exit $?
+        sudo apt update && sudo apt install -y \
+        debhelper \
+        dh-python \
+        python3-bloom \
+        python3-catkin-pkg \
+        python3-colcon-common-extensions \
+        python3-rosdep \
+        ros-jazzy-ros-base \
+        ros-jazzy-sdl2-vendor \
+        fakeroot || exit $?
+    - name: Download and install audio_tools package
+      run: |
+        curl -s https://api.github.com/repos/CLFML/ROS2_Audio_Tools/releases/latest \
+        | grep "browser_download_url.*deb" \
+        | cut -d : -f 2,3 \
+        | tr -d \" \
+        | wget -qi -
 
-          # Generate changelogs
-          catkin_generate_changelog --all || true
-      
-          # Loop through packages
-          for PACKAGE in $(colcon list -t | cut -f2); do
-            cd "$ROOT_DIR/$PACKAGE" || continue
-      
-            # Install dependencies
-            rosdep install -y --rosdistro "$ROS2_DISTRO" --from-paths . --skip-keys="audio_tools" || exit $?
-      
-            # Source ROS 2 env
-            source /opt/ros/$ROS2_DISTRO/setup.bash || exit $?
-      		
-            # Generate Debian rules
-            
-            bloom-generate rosdebian --ros-distro "$ROS2_DISTRO" -i "$RELEASE_VERSION" || exit $?
-      	    sed -i '/dh_auto_configure -- \\/{N;s|\(dh_auto_configure --[^\n]*\\\)|\1\n\t\t-DCLFML_LOWWI_NATIVE_DEB_PACKAGING=ON \\\n\t\t-DCLFML_LOWWI_ROS2_PACKAGE_BUILD=ON \\|}' debian/rules
+        sudo dpkg -i *.deb
+        echo -e "audio_tools:\n  ubuntu:\n    noble: [ros-jazzy-audio-tools]" | sudo tee /etc/ros/rosdep/audio_tools.yaml
+        echo "yaml file:///etc/ros/rosdep/audio_tools.yaml" | sudo tee /etc/ros/rosdep/sources.list.d/99-audio-tools.list
+        sudo rosdep update
 
-            # Build .deb with fakeroot and custom CMake args
-            LD_LIBRARY_PATH=$ROOT_DIR/debian/ros-jazzy-lowwi/opt/ros/jazzy/lib fakeroot debian/rules binary -j8 || exit $?
-      
-            # Install .deb locally
-            sudo dpkg --install ../*.deb || continue
-      
-            # Move artifacts to output dir
-            mkdir -p "$ROOT_DIR/$OUTPUT_DIR"
-            mv ../*.deb "$ROOT_DIR/$OUTPUT_DIR" || true
-            mv ../*.ddeb "$ROOT_DIR/$OUTPUT_DIR" || true
-          done
-      
-      - name: Upload Release Asset
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-            REPO_FULL=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
-            TAG_NAME=$(gh release view --repo "$REPO_FULL" --json tagName --jq ".tagName")
-  
-            gh release upload "$TAG_NAME" package/*.deb --repo "$REPO_FULL"
+    - name: Checkout this repository
+      uses: actions/checkout@v2.3.4
+    - name: Build and package ROS 2 packages
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        set -e
+
+        export ROS2_DISTRO="jazzy"
+        export OUTPUT_DIR="package"
+        export UNIQUE_VERSION="true"
+        export ROOT_DIR=$(pwd)
+        # Get version from latest GitHub release (strip 'v')
+        export RELEASE_VERSION="$(gh release view --json tagName --jq .tagName | sed 's/^v//')"
+
+        # Generate changelogs
+        catkin_generate_changelog --all || true
+
+        # Loop through packages
+        for PACKAGE in $(colcon list -t | cut -f2); do
+          cd "$ROOT_DIR/$PACKAGE" || continue
+
+          # Install dependencies
+          rosdep install -y --rosdistro "$ROS2_DISTRO" --from-paths . --skip-keys="audio_tools" || exit $?
+
+          # Source ROS 2 env
+          source /opt/ros/$ROS2_DISTRO/setup.bash || exit $?
+
+          # Generate Debian rules
+          bloom-generate rosdebian --ros-distro "$ROS2_DISTRO" -i "$RELEASE_VERSION" || exit $?
+          sed -i '/dh_auto_configure -- \\/{N;s|\(dh_auto_configure --[^\n]*\\\)|\1\n\t\t-DCLFML_LOWWI_NATIVE_DEB_PACKAGING=ON \\\n\t\t-DCLFML_LOWWI_ROS2_PACKAGE_BUILD=ON \\|}' debian/rules
+
+          # Build .deb with fakeroot and custom CMake args
+          LD_LIBRARY_PATH=$ROOT_DIR/debian/ros-jazzy-lowwi/opt/ros/jazzy/lib fakeroot debian/rules binary -j8 || exit $?
+
+          # Install .deb locally
+          sudo dpkg --install ../*.deb || continue
+
+          # Move artifacts to output dir
+          mkdir -p "$ROOT_DIR/$OUTPUT_DIR"
+          mv ../*.deb "$ROOT_DIR/$OUTPUT_DIR" || true
+          mv ../*.ddeb "$ROOT_DIR/$OUTPUT_DIR" || true
+        done
+
+    - name: Upload Release Asset
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        REPO_FULL=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
+        TAG_NAME=$(gh release view --repo "$REPO_FULL" --json tagName --jq ".tagName")
+
+        gh release upload "$TAG_NAME" package/*.deb --repo "$REPO_FULL"
