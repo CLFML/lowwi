@@ -35,6 +35,8 @@ jobs:
       - name: Checkout this repository
         uses: actions/checkout@v2.3.4
       - name: Build and package ROS 2 packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
       
