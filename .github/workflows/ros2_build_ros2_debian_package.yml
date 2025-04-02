@@ -34,6 +34,10 @@ jobs:
               | wget -qi -
               
               sudo dpkg -i *.deb
+              echo -e "audio_tools:\n  ubuntu:\n    noble: [ros-jazzy-audio-tools]" | sudo tee /etc/ros/rosdep/audio_tools.yaml
+	      echo "yaml file:///etc/ros/rosdep/audio_tools.yaml" | sudo tee /etc/ros/rosdep/sources.list.d/99-audio-tools.list
+	      sudo rosdep update
+              
       - name: Checkout this repository
         uses: actions/checkout@v2.3.4
       - name: Build and package ROS 2 packages
@@ -42,12 +46,12 @@ jobs:
         run: |
           set -e
       
-          ROS2_DISTRO="jazzy"
-          OUTPUT_DIR="package"
-          UNIQUE_VERSION="true"
-          ROOT_DIR=$(pwd)
+          export ROS2_DISTRO="jazzy"
+          export OUTPUT_DIR="package"
+          export UNIQUE_VERSION="true"
+          export ROOT_DIR=$(pwd)
           # Get version from latest GitHub release (strip 'v')
-          export RELEASE_VERSION ="$(gh release view --json tagName --jq .tagName | sed 's/^v//')"
+          export RELEASE_VERSION="$(gh release view --json tagName --jq .tagName | sed 's/^v//')"
 
           # Generate changelogs
           catkin_generate_changelog --all || true
@@ -61,13 +65,14 @@ jobs:
       
             # Source ROS 2 env
             source /opt/ros/$ROS2_DISTRO/setup.bash || exit $?
-      
+      		
             # Generate Debian rules
+            
             bloom-generate rosdebian --ros-distro "$ROS2_DISTRO" -i "$RELEASE_VERSION" || exit $?
-      
+      	    sed -i '/dh_auto_configure -- \\/{N;s|\(dh_auto_configure --[^\n]*\\\)|\1\n\t\t-DCLFML_LOWWI_NATIVE_DEB_PACKAGING=ON \\\n\t\t-DCLFML_LOWWI_ROS2_PACKAGE_BUILD=ON \\|}' debian/rules
+
             # Build .deb with fakeroot and custom CMake args
-            export DEB_CMAKE_EXTRA_FLAGS="-DCLFML_LOWWI_NATIVE_DEB_PACKAGING=ON"
-            fakeroot debian/rules binary -j8 || exit $?
+            LD_LIBRARY_PATH=$ROOT_DIR/debian/ros-jazzy-lowwi/opt/ros/jazzy/lib fakeroot debian/rules binary -j8 || exit $?
       
             # Install .deb locally
             sudo dpkg --install ../*.deb || continue

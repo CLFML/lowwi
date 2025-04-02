@@ -101,6 +101,8 @@ if(CLFML_LOWWI_ROS2_PACKAGE_BUILD)
     if(CLFML_LOWWI_NATIVE_DEB_PACKAGING)
         message(STATUS "Native deb packaging enabled")
         add_compile_definitions(-DCLFML_LOWWI_NATIVE_DEB_PACKAGING)
+        file(GLOB onnx_so_files ${CMAKE_CURRENT_LIST_DIR}/lib/x64/lib/*.so*)
+	install(FILES ${onnx_so_files} DESTINATION lib/)
     endif()
 
     find_package(ament_cmake REQUIRED)
