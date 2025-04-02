@@ -35,8 +35,8 @@ jobs:
               
               sudo dpkg -i *.deb
               echo -e "audio_tools:\n  ubuntu:\n    noble: [ros-jazzy-audio-tools]" | sudo tee /etc/ros/rosdep/audio_tools.yaml
-	      echo "yaml file:///etc/ros/rosdep/audio_tools.yaml" | sudo tee /etc/ros/rosdep/sources.list.d/99-audio-tools.list
-	      sudo rosdep update
+              echo "yaml file:///etc/ros/rosdep/audio_tools.yaml" | sudo tee /etc/ros/rosdep/sources.list.d/99-audio-tools.list
+              sudo rosdep update
               
       - name: Checkout this repository
         uses: actions/checkout@v2.3.4
