@@ -54,7 +54,7 @@ Published to `/lowwi_ww` (or a user-defined topic), of type `lowwi/msg/WakeWord`
 ### 🏁 Run Example
 
 ```bash
-ros2 run lowwi_pkg lowwi_node \
+ros2 run lowwi lowwi_node \
   --ros-args \
   -p wakeword.phrases:="['Hey Mycroft', 'Hey Jarvis']" \
   -p wakeword.models:="['models/hey_mycroft.onnx', 'models/hey_jarvis.onnx']" \
