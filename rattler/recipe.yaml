@@ -35,7 +35,7 @@ build:
   number: 0
   script:
   - if: win
-    then: 'bld_colcon_merge.bat'
+    then: 'bld_ament_cmake.bat'
     else: '$RECIPE_DIR/build_ament_cmake.sh'
 requirements:
   build:

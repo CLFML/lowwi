@@ -11,7 +11,6 @@ option(CLFML_LOWWI_NATIVE_DEB_PACKAGING "Build native deb package (sets paths to
 # === C++ standard and policies ===
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 if(POLICY CMP0077)
     cmake_policy(SET CMP0077 NEW)
 endif()
@@ -114,12 +113,14 @@ if(CLFML_LOWWI_ROS2_PACKAGE_BUILD)
     find_package(rclcpp REQUIRED)
     find_package(builtin_interfaces REQUIRED)
     find_package(rosidl_default_generators REQUIRED)
+    find_package(rosidl_generator_py REQUIRED) 
     find_package(std_msgs REQUIRED)
     find_package(std_srvs REQUIRED)
     find_package(SDL2)
     find_package(audio_tools)
 
-    target_link_libraries(lowwi_lib ${cv_bridge_LIBRARIES})
+    ament_export_include_directories(src)
+    ament_export_libraries(lowwi_lib)
 
     add_executable(lowwi_node bindings/ros2/lowwi_node.cpp)
 
@@ -148,13 +149,16 @@ if(CLFML_LOWWI_ROS2_PACKAGE_BUILD)
 
     set(LOWWI_EXAMPLE_FRAGMENTS_PATH ${CMAKE_CURRENT_LIST_DIR}/example/LOWWI_demo_fragment/example_fragments)
     target_compile_definitions(lowwi_lib PUBLIC -DCLFML_LOWWI_EXAMPLE_FRAGMENTS="${LOWWI_EXAMPLE_FRAGMENTS_PATH}")
-
+    if(MSVC)
+    install(TARGETS lowwi_lib DESTINATION lib/${PROJECT_NAME})
+    else()
     install(TARGETS lowwi_lib DESTINATION lib/)
+    endif()
     install(TARGETS lowwi_node DESTINATION lib/${PROJECT_NAME})
     install(DIRECTORY ${MODELS_SOURCE_DIR} DESTINATION lib/${PROJECT_NAME})
     install(FILES bindings/ros2/set_ld_path.sh DESTINATION lib/${PROJECT_NAME})
-
     ament_package()
+    
 endif()
 
 # === Examples ===

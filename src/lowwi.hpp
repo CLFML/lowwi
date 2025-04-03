@@ -27,6 +27,7 @@
 #include <lowwi_melspectrogram.hpp>
 #include <lowwi_wakeword.hpp>
 #include <string>
+#include "lowwi_visibility_export.h"
 
 namespace CLFML::LOWWI {
 /**
@@ -67,7 +68,7 @@ struct Lowwi_word_t {
   uint32_t min_activations = 5;
 };
 
-class Lowwi {
+class LOWWI_PUBLIC Lowwi {
 public:
   Lowwi();
 
