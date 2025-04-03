@@ -33,6 +33,12 @@ source /opt/ros/jazzy/setup.sh
 
 When model dir present run the node:
 
+**First run the audio_capture_node**
+
+```bash
+ros2 run audio_tools audio_capture_node
+```
+
 ```bash
 # run this command to launch lowwi node with default models:
 ros2 run lowwi lowwi_node \
