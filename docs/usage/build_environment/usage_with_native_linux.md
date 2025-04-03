@@ -5,7 +5,7 @@ Prefer a traditional system-wide install? Use the prebuilt `.deb` package for **
 ---
 
 ## Node details
-For more details about the node see: [ROS2 Lowwi Wakeword Detection Node page in implementation tab](/about/implementation_ros/)
+For more details about the node see: [ROS2 Lowwi Wakeword Detection Node page in implementation tab](/lowwi/about/implementation_ros/)
 
 ## 📦 Install package via `.deb`
 

@@ -4,7 +4,7 @@ Pixi makes cross-platform ROS 2 development easy. You can build and run both cap
 
 ---
 ## Node details
-For more details about the node see: [ROS2 Lowwi Wakeword Detection Node page in implementation tab](/about/implementation_ros/)
+For more details about the node see: [ROS2 Lowwi Wakeword Detection Node page in implementation tab](/lowwi/about/implementation_ros/)
 
 ## 📦 Install Pixi
 
