@@ -21,13 +21,13 @@
 
 #ifndef LOWWI_HPP
 #define LOWWI_HPP
+#include "lowwi_visibility_export.h"
 #include <any>
 #include <functional>
 #include <lowwi_embedding.hpp>
 #include <lowwi_melspectrogram.hpp>
 #include <lowwi_wakeword.hpp>
 #include <string>
-#include "lowwi_visibility_export.h"
 
 namespace CLFML::LOWWI {
 /**
