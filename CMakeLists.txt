@@ -57,7 +57,7 @@ else()
     if(MSVC)
         FetchContent_Declare(
             onnxruntime
-            URL https://github.com/microsoft/onnxruntime/releases/download/v1.17.1/onnxruntime-win-x64-1.17.1.zip
+            URL https://github.com/microsoft/onnxruntime/releases/download/v1.18.1/onnxruntime-win-x64-1.18.1.zip
             SOURCE_DIR ${ONNXRUNTIME_ROOTDIR}
         )
         FetchContent_MakeAvailable(onnxruntime)
@@ -101,11 +101,11 @@ add_custom_target(copy_models ALL
 if(CLFML_LOWWI_ROS2_PACKAGE_BUILD)
     if(CLFML_LOWWI_CONDA_PACKAGING)
         message(STATUS "Conda packaging enabled")
-        add_compile_definitions(-DCLFML_LOWWI_CONDA_PACKAGING)
+        add_compile_definitions(CLFML_LOWWI_CONDA_PACKAGING)
     endif()
     if(CLFML_LOWWI_NATIVE_DEB_PACKAGING)
         message(STATUS "Native deb packaging enabled")
-        add_compile_definitions(-DCLFML_LOWWI_NATIVE_DEB_PACKAGING)
+        add_compile_definitions(CLFML_LOWWI_NATIVE_DEB_PACKAGING)
         file(GLOB onnx_so_files ${CMAKE_CURRENT_LIST_DIR}/lib/x64/lib/*.so*)
 	install(FILES ${onnx_so_files} DESTINATION lib/)
     endif()
@@ -140,9 +140,9 @@ if(CLFML_LOWWI_ROS2_PACKAGE_BUILD)
     if(MSVC)
         file(GLOB onnx_dlls ${ONNXRUNTIME_ROOTDIR}/lib/*.dll)
         file(GLOB onnx_libs ${ONNXRUNTIME_ROOTDIR}/lib/*.lib)
-        install(FILES ${onnx_dlls} ${onnx_libs} DESTINATION lib/)
+        install(FILES ${onnx_dlls} ${onnx_libs} DESTINATION lib/${PROJECT_NAME})
     else()
-        file(GLOB onnx_so_files lib/*.so*)
+        file(GLOB onnx_so_files  ${ONNXRUNTIME_ROOTDIR}/lib/*.so*)
         install(FILES ${onnx_so_files} DESTINATION lib/)
     endif()
 

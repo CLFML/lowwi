@@ -29,8 +29,14 @@ Embedding::Embedding(Ort::Env &env, Ort::SessionOptions &session_options)
   // Get the CONDA_PREFIX environment variable
   const char *condapath = std::getenv("CONDA_PREFIX");
   if (condapath) {
+#ifdef WIN32
+    // Prepend CONDA_PREFIX to the model path if the environment variable is set
+    std::filesystem::path model_path =
+        std::filesystem::path(condapath) / "Library" / "lib" / "lowwi" / _embedding_model_path;
+#else
     // Prepend CONDA_PREFIX to the model path if the environment variable is set
     std::filesystem::path model_path = std::filesystem::path(condapath) / "lib" / "lowwi" / _embedding_model_path;
+#endif
 
     // Now use model_path to create a session
     _session = std::make_unique<Ort::Session>(_env, model_path.c_str(), _session_options);
