@@ -93,6 +93,13 @@ or (if using windows)
 LOWWI_demo.exe
 ```
 
+### Usage with ROS Pixi (Highly recommeneded with ROS2)
+**See the [wiki page!](https://clfml.github.io/lowwi/usage/build_environment/ros2_pixi_build_linux_windows/)**
+
+## Usage with ROS prebuilt .deb package
+**See the [wiki page!](https://clfml.github.io/lowwi/usage/build_environment/usage_with_native_linux/)**
+
+
 ### Using it in your project as library
 Add this to your top-level CMakeLists file:
 ```cmake

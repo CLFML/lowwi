@@ -1,43 +1,43 @@
 site_name: Lowwi
 extra_css:
-  - assets/stylesheets/logo.css
+- assets/stylesheets/logo.css
 theme:
   name: material
   # custom_dir: docs/overrides
   features:
-    - announce.dismiss
-    - content.action.edit
-    - content.action.view
-    - content.code.annotate
-    - content.code.copy
-    # - content.code.select
-    # - content.footnote.tooltips
-    # - content.tabs.link
-    - content.tooltips
-    # - header.autohide
-    # - navigation.expand
-    - navigation.footer
-    - navigation.indexes
-    # - navigation.instant
-    # - navigation.instant.prefetch
-    # - navigation.instant.progress
-    # - navigation.prune
-    - navigation.sections
-    - navigation.tabs
-    # - navigation.tabs.sticky
-    - navigation.top
-    - navigation.tracking
-    - search.highlight
-    - search.share
-    - search.suggest
-    - toc.follow
-    # - toc.integrate
+  - announce.dismiss
+  - content.action.edit
+  - content.action.view
+  - content.code.annotate
+  - content.code.copy
+  # - content.code.select
+  # - content.footnote.tooltips
+  # - content.tabs.link
+  - content.tooltips
+  # - header.autohide
+  # - navigation.expand
+  - navigation.footer
+  - navigation.indexes
+  # - navigation.instant
+  # - navigation.instant.prefetch
+  # - navigation.instant.progress
+  # - navigation.prune
+  - navigation.sections
+  - navigation.tabs
+  # - navigation.tabs.sticky
+  - navigation.top
+  - navigation.tracking
+  - search.highlight
+  - search.share
+  - search.suggest
+  - toc.follow
+  # - toc.integrate
   palette:
-      scheme: default
-      primary: yellow
-      toggle:
-        icon: material/toggle-switch
-        name: Switch to dark mode
+    scheme: default
+    primary: yellow
+    toggle:
+      icon: material/toggle-switch
+      name: Switch to dark mode
   font:
     text: Avenir Next Condensed
     code: Avenir Next Condensed
@@ -45,25 +45,29 @@ theme:
   logo: assets/logo.png
 
 markdown_extensions:
-  - attr_list
-  - md_in_html
-  - admonition
-  - pymdownx.details
-  - pymdownx.superfences
+- attr_list
+- md_in_html
+- admonition
+- pymdownx.details
+- pymdownx.superfences
 
 nav:
-  - index.md
-  - Getting Started:
-    - usage/overview.md
-    - Build Environment:
-      - usage/build_environment/usage_with_windows.md
-      - usage/build_environment/usage_with_mac.md
-      - usage/build_environment/usage_with_linux.md
-    - Running the examples:
-      - usage/lowwi_demo.md
-      - usage/lowwi_demo_mic.md
-  - Implementation:
-    - about/implementation.md
-  - Contributing:
-    - contributing/rules.md
-    - contributing/license.md
+- index.md
+- Getting Started:
+  - usage/overview.md
+  - Build Environment:
+    - usage/build_environment/usage_with_windows.md
+    - usage/build_environment/usage_with_mac.md
+    - usage/build_environment/usage_with_linux.md
+  - ROS2 Build Environment:
+    - usage/build_environment/usage_with_native_linux.md
+    - usage/build_environment/ros2_pixi_build_linux_windows.md
+  - Running the examples:
+    - usage/lowwi_demo.md
+    - usage/lowwi_demo_mic.md
+- Implementation:
+  - about/implementation.md
+  - about/implementation_ros.md
+- Contributing:
+  - contributing/rules.md
+  - contributing/license.md
