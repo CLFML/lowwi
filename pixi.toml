@@ -24,7 +24,7 @@ rattler-build = "*"
 
 
 [target.linux-64.dependencies]
-python = "3.11.*"
+python = "3.12.*"
 python-devtools = "*"         # Optional but useful
 pybind11 = "*"                # Optional, if you work with bindings
 numpy = "*"
